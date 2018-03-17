@@ -6,7 +6,16 @@ import java.util.Date;
 public class Question implements Serializable {
     private Long id;
 
+    private Long user;
     private String title;
+
+    public Long getUser() {
+        return user;
+    }
+
+    public void setUser(Long user) {
+        this.user = user;
+    }
 
     private Long type;
 

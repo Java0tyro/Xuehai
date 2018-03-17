@@ -1,7 +1,10 @@
 package xuehai.dao;
 
-import xuehai.model.Question;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+import xuehai.model.*;
 
+@Repository
 public interface QuestionMapper {
     int deleteByPrimaryKey(Long id);
 
@@ -16,4 +19,14 @@ public interface QuestionMapper {
     int updateByPrimaryKeyWithBLOBs(Question record);
 
     int updateByPrimaryKey(Question record);
+
+
+    Question publish(Question question);
+    Collection collect(@Param("userId") Long userId, @Param("questionId") Long questionId);
+
+
+    Answer answerQuestion(Answer answer);
+    Like likeAnswer(@Param("userId") Long userId, @Param("answerId") Long answerId);
+
+    Comment commentAnswer(Comment comment);
 }
