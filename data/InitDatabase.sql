@@ -3,6 +3,9 @@ IF
 	EXISTS `demo_xuehai`;
 CREATE DATABASE `demo_xuehai` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `demo_xuehai`;
+
+-- 建表
+
 CREATE TABLE `user` (
 `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
 `username` VARCHAR ( 64 ) NOT NULL UNIQUE,
@@ -94,3 +97,19 @@ CREATE TABLE `message` (
 `time` TIMESTAMP NOT NULL,
 FOREIGN KEY ( `user` ) REFERENCES `user` ( `id` ) ON DELETE CASCADE ON UPDATE CASCADE 
 );
+
+-- 建视图
+CREATE VIEW `following` AS SELECT
+`a`.`id` AS `id`,
+COUNT( * ) AS `num` 
+FROM
+	( `user` `a` JOIN `follow` `b` ON ( ( `b`.`user_from` = `a`.`id` ) ) ) 
+GROUP BY
+	`a`.`id`;
+CREATE VIEW `follower` AS SELECT
+`a`.`id` AS `id`,
+COUNT( * ) AS `num` 
+FROM
+	( `user` `a` JOIN `follow` `b` ON ( ( `b`.`user_to` = `a`.`id` ) ) ) 
+GROUP BY
+	`a`.`id`;
