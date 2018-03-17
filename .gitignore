@@ -1,4 +1,7 @@
-/.idea/
-/.git/
-/target/
+.idea/
+target/
 Xuehai.iml
+
+# VS Code 生成文件
+.project
+.settings/
