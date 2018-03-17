@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xuehai.dao.FollowMapper">
+  <resultMap id="BaseResultMap" type="xuehai.model.Follow">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="user_from" jdbcType="BIGINT" property="userFrom" />
+    <result column="user_to" jdbcType="BIGINT" property="userTo" />
+    <result column="time" jdbcType="TIMESTAMP" property="time" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_from, user_to, time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from follow
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from follow
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="xuehai.model.Follow">
+    insert into follow (id, user_from, user_to, 
+      time)
+    values (#{id,jdbcType=BIGINT}, #{userFrom,jdbcType=BIGINT}, #{userTo,jdbcType=BIGINT}, 
+      #{time,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="xuehai.model.Follow">
+    insert into follow
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="userFrom != null">
+        user_from,
+      </if>
+      <if test="userTo != null">
+        user_to,
+      </if>
+      <if test="time != null">
+        time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="userFrom != null">
+        #{userFrom,jdbcType=BIGINT},
+      </if>
+      <if test="userTo != null">
+        #{userTo,jdbcType=BIGINT},
+      </if>
+      <if test="time != null">
+        #{time,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="xuehai.model.Follow">
+    update follow
+    <set>
+      <if test="userFrom != null">
+        user_from = #{userFrom,jdbcType=BIGINT},
+      </if>
+      <if test="userTo != null">
+        user_to = #{userTo,jdbcType=BIGINT},
+      </if>
+      <if test="time != null">
+        time = #{time,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="xuehai.model.Follow">
+    update follow
+    set user_from = #{userFrom,jdbcType=BIGINT},
+      user_to = #{userTo,jdbcType=BIGINT},
+      time = #{time,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

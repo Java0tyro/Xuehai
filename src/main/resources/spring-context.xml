@@ -30,8 +30,9 @@
             </bean>
         </property>
         <!-- <property name="configLocation" value="classpath:mybatis/mybatis-config.xml"></property> -->
-        <!-- 别名 -->
+        <!-- 别名
         <property name="typeAliasesPackage" value="xuehai.model" />
+        -->
         <property name="mapperLocations" value="classpath:xuehai/mapper/*.xml" />
     </bean>
 
