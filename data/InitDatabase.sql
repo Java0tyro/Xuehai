@@ -1,9 +1,8 @@
 DROP DATABASE
 IF
-	EXISTS `demo_Xuehai`;
-CREATE DATABASE `demo` DEFAULT CHARACTER 
-SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `demo`;
+	EXISTS `demo_xuehai`;
+CREATE DATABASE `demo_xuehai` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `demo_xuehai`;
 CREATE TABLE `user` (
 `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
 `username` VARCHAR ( 64 ) NOT NULL UNIQUE,
