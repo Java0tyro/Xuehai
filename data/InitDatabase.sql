@@ -126,7 +126,7 @@ CREATE TABLE follow (
 -- 添加回答时：问题回答数+1，回答者回答数+1
 DROP TRIGGER IF EXISTS add_answer;
 DELIMITER $$
-CREATE TRIGGER `add_answer` AFTER INSERT ON `answer` FOR EACH ROW
+CREATE TRIGGER add_answer AFTER INSERT ON `answer` FOR EACH ROW
 BEGIN
 	UPDATE `question` SET `answer_num` = `answer_num` + 1 WHERE `id` = NEW.`question`;
 	UPDATE `user` SET `answer_num` = `answer_num` + 1 WHERE `id` = NEW.`user`;
@@ -136,7 +136,7 @@ DELIMITER ;
 -- 删除回答时：删除回答的评论，删除回答的赞，问题回答数-1，回答者回答数-1，
 DROP TRIGGER IF EXISTS del_answer;
 DELIMITER $$
-CREATE TRIGGER `del_answer` BEFORE DELETE ON `answer` FOR EACH ROW
+CREATE TRIGGER del_answer BEFORE DELETE ON `answer` FOR EACH ROW
 BEGIN
 	DELETE FROM `comment` WHERE answer = OLD.id;
 	DELETE FROM `like` WHERE answer = OLD.id;
@@ -160,7 +160,7 @@ DELIMITER ;
 -- 删除收藏时：问题收藏数-1，用户收藏数-1
 DROP TRIGGER IF EXISTS del_collection;
 DELIMITER $$
-CREATE TRIGGER `del_collection` BEGIN DELETE ON `collection` FOR EACH ROW
+CREATE TRIGGER `del_collection` BEFORE DELETE ON `collection` FOR EACH ROW
 BEGIN
 	UPDATE `question` SET collection_num = collection_num - 1 WHERE `id` = OLD.question;
 	UPDATE `user` SET collection_num = collection_num - 1 WHERE `id` = OLD.`user`;
