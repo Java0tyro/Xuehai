@@ -1,11 +1,11 @@
 DROP DATABASE
 IF
 	EXISTS `demo_xuehai`;
+
 CREATE DATABASE `demo_xuehai` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 USE `demo_xuehai`;
-
 -- 建表
-
 CREATE TABLE `user` (
 `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
 `username` VARCHAR ( 64 ) NOT NULL UNIQUE,
@@ -37,7 +37,7 @@ CREATE TABLE `question` (
 `time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 FOREIGN KEY ( `user` ) REFERENCES `user` ( `id` ) ON DELETE SET NULL ON UPDATE CASCADE,
 FOREIGN KEY ( `type` ) REFERENCES `question_type` ( `id` ) ON DELETE SET NULL ON UPDATE CASCADE 
-);
+	);
 CREATE TABLE `answer` (
 `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
 `content` text NOT NULL,
@@ -57,11 +57,10 @@ CREATE TABLE `comment` (
 `answer` BIGINT NOT NULL,
 `parent` BIGINT,
 `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-FOREIGN KEY ( `user` ) REFERENCES `user` ( `id` ) ON DELETE 
-SET NULL ON UPDATE CASCADE,
+FOREIGN KEY ( `user` ) REFERENCES `user` ( `id` ) ON DELETE SET NULL ON UPDATE CASCADE,
 FOREIGN KEY ( `answer` ) REFERENCES `answer` ( `id` ) ON DELETE CASCADE ON UPDATE CASCADE,
 FOREIGN KEY ( `parent` ) REFERENCES `comment` ( `id` ) ON DELETE SET NULL ON UPDATE CASCADE 
-);
+	);
 CREATE TABLE `collection` (
 `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
 `user` BIGINT NOT NULL,
@@ -97,19 +96,57 @@ CREATE TABLE `message` (
 `time` TIMESTAMP NOT NULL,
 FOREIGN KEY ( `user` ) REFERENCES `user` ( `id` ) ON DELETE CASCADE ON UPDATE CASCADE 
 );
-
 -- 建视图
-CREATE VIEW `following` AS SELECT
+-- 关注数
+CREATE VIEW `following` AS 
+SELECT
 `a`.`id` AS `id`,
 COUNT( * ) AS `num` 
 FROM
-	( `user` `a` JOIN `follow` `b` ON ( ( `b`.`user_from` = `a`.`id` ) ) ) 
+	( `user` `a` JOIN `follow` `b` ON ( ( `a`.`id` = `b`.`user_from` ) ) ) 
 GROUP BY
 	`a`.`id`;
-CREATE VIEW `follower` AS SELECT
+-- 被关注数
+CREATE VIEW `follower` AS 
+SELECT
 `a`.`id` AS `id`,
 COUNT( * ) AS `num` 
 FROM
-	( `user` `a` JOIN `follow` `b` ON ( ( `b`.`user_to` = `a`.`id` ) ) ) 
+	( `user` `a` JOIN `follow` `b` ON ( ( `a`.`id` = `b`.`user_to` ) ) ) 
+GROUP BY
+	`a`.`id`;
+-- 问题收藏数
+CREATE VIEW `collection_num` AS 
+SELECT
+`a`.`id` AS `id`,
+COUNT( * ) AS `num` 
+FROM
+	( `question` `a` JOIN `collection` `b` ON ( ( `a`.`id` = `b`.`question` ) ) ) 
+GROUP BY
+	`a`.`id`;
+-- 问题回答数
+CREATE VIEW `answer_num` AS SELECT
+`a`.`id` AS `id`,
+COUNT( * ) AS `num` 
+FROM
+	( `question` `a` JOIN `answer` `b` ON ( ( `a`.`id` = `b`.`question` ) ) ) 
+GROUP BY
+	`a`.`id`;
+-- 回答点赞数
+CREATE VIEW `like_num` AS 
+SELECT
+`a`.`id` AS `id`,
+COUNT( * ) AS `num` 
+FROM
+	( `answer` `a` JOIN `like` `b` ON ( ( `a`.`id` = `b`.`answer` ) ) ) 
+GROUP BY
+	`a`.`id`;
+-- 评论数
+CREATE VIEW `comment_num` AS 
+SELECT
+`a`.`id` AS `id`,
+COUNT( * ) AS `num` 
+FROM
+	( `answer` `a` JOIN `comment` `b` ON ( ( `a`.`id` = `b`.`answer` ) ) ) 
 GROUP BY
 	`a`.`id`;
