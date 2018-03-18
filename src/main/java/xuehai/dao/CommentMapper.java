@@ -2,6 +2,8 @@ package xuehai.dao;
 
 import xuehai.model.Comment;
 
+import java.util.List;
+
 public interface CommentMapper {
     int deleteByPrimaryKey(Long id);
 
@@ -10,6 +12,7 @@ public interface CommentMapper {
     int insertSelective(Comment record);
 
     Comment selectByPrimaryKey(Long id);
+    List<Comment> selectSelective(Comment comment);
 
     int updateByPrimaryKeySelective(Comment record);
 

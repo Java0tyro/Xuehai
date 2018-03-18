@@ -1,17 +1,19 @@
 package xuehai.controller.user;
 
 
+import xuehai.model.Follow;
 import xuehai.model.User;
 import xuehai.service.UserService;
 import xuehai.util.ByteToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import xuehai.util.SessionUtil;
+import xuehai.vo.RegistVo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.security.MessageDigest;
 
 
@@ -21,42 +23,38 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @ResponseBody
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public void login(@RequestBody String email, @RequestBody String password, @RequestBody String redirectUrl, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse){
-
+    public String login(@RequestBody RegistVo registVo,
+                        HttpServletRequest httpServletRequest,
+                        HttpServletResponse httpServletResponse){
+        String email = registVo.getUser().getEmail();
+        String password = registVo.getUser().getPassword();
+        if(null == email || null == password){
+            return null;
+        }
         User user = userService.login(email);
         if(user == null){
-            return;
+            return null;
         }
         String salt = user.getSalt();
         String strResult = null;
         try{
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             messageDigest.update((salt + password).getBytes() );
-
             byte byteBuffer[] = messageDigest.digest();
             strResult = ByteToString.getString(byteBuffer);
         }
         catch(Exception e){
 
         }
-        if(strResult != null && strResult == user.getPassword()){
-            HttpSession session = httpServletRequest.getSession(true);
-            session.setAttribute("userId", user.getId());
-            session.setAttribute("login", true);
-            session.setAttribute("authority", user.getAuthority());
-            session.setAttribute("userName", user.getUsername());
-            session.setAttribute("email", user.getEmail());
-            httpServletResponse.setHeader("Content-type", "application/json;charset=utf-8");
-            try {
-                httpServletResponse.getWriter().write("{\"redirect\":\"" + redirectUrl + "\"}");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return ;
 
+        if(strResult != null && strResult.equals(user.getPassword())){
+            SessionUtil.addInformation(httpServletRequest, user);
+            System.out.println(email + " 1" + password);
+            return registVo.getRedirectUrl();
         }
-        return ;
+        return null;
 
     }
 
@@ -67,44 +65,68 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/regist", method = RequestMethod.POST)
-    public User regist(@RequestBody User user,
+    public String regist(@RequestBody RegistVo registVo,
                        HttpServletRequest httpServletRequest,
                        HttpServletResponse httpServletResponse){
+        User user = registVo.getUser();
         User user1 =  userService.regist(user);
         if(user1 != null){
-            HttpSession session = httpServletRequest.getSession(true);
-            session.setAttribute("userId", user1.getId());
-            session.setAttribute("login", true);
-            session.setAttribute("authority", user1.getAuthority());
-            session.setAttribute("userName", user1.getUsername());
-            session.setAttribute("email", user1.getEmail());
-            httpServletResponse.setHeader("Content-type", "application/json;charset=utf-8");
-            return user1;
+            SessionUtil.addInformation(httpServletRequest, user1);
+            return registVo.getRedirectUrl();
         }
-        return null;
+        return "/regist";
     }
 
+    @RequestMapping(value = "/regist", method = RequestMethod.GET)
+    public String getRegist(){
+        return "regist";
+    }
+
+
+    @ResponseBody
     @RequestMapping(value = "/modify", method = RequestMethod.POST)
-    public void modify(@RequestBody User user, HttpServletRequest httpServletRequest){
+    public String modify(@RequestBody User user, HttpServletRequest httpServletRequest){
         if((Boolean) httpServletRequest.getSession().getAttribute("login")){
-            user.setId((Long)httpServletRequest.getSession().getAttribute("userId"));
-            User user1 = userService.modify(user);
+            HttpSession session = httpServletRequest.getSession();
+            user.setId((Long)session.getAttribute("userId"));
+            user.setAuthority((int)session.getAttribute("authority"));
+            user.setTime(null);
+            if(null == userService.modify(user)){
+                return "0";
+            }
+            SessionUtil.addInformation(httpServletRequest, user);
+            return "1";
         }
+        return "0";
     }
 
-    @RequestMapping(value = "/follow/{id}")
-    public void follow(@PathVariable Long id, HttpServletRequest httpServletRequest){
+    @ResponseBody
+    @RequestMapping(value = "/follow/{id}", method = RequestMethod.POST)
+    public String follow(@PathVariable Long id, HttpServletRequest httpServletRequest){
         if((Boolean) httpServletRequest.getSession().getAttribute("login")){
-            userService.follow((Long) httpServletRequest.getSession().getAttribute("userId"), id);
+            Follow follow = userService.follow((Long) httpServletRequest.getSession().getAttribute("userId"), id);
+            if(follow == null){
+                return "0";
+            }
+            return "1";
         }
+        return "0";
     }
 
-    @RequestMapping(value = "/delete/{id}")
-    public User deleteUser(@PathVariable Long id, HttpServletRequest httpServletRequest){
+
+    @ResponseBody
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
+    public String deleteUser(@PathVariable Long id, HttpServletRequest httpServletRequest){
         HttpSession session = httpServletRequest.getSession();
-        if((Boolean)session.getAttribute("login") && (short)session.getAttribute("authority") == (short)1){
-            return userService.deleteUser(id);
+        if((Boolean)session.getAttribute("login") && (Integer)session.getAttribute("authority") == 1){
+            int judge = userService.deleteUser(id);
+            if(judge != 0){
+                //System.out.println(1);
+                return "1";
+            }
+            //System.out.println(0);
+            return "0";
         }
-        return null;
+        return "0";
     }
 }

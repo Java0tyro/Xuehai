@@ -25,7 +25,7 @@
     values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{parent,jdbcType=BIGINT}
       )
   </insert>
-  <insert id="insertSelective" parameterType="xuehai.model.QuestionType">
+  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="xuehai.model.QuestionType">
     insert into question_type
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -68,4 +68,22 @@
       parent = #{parent,jdbcType=BIGINT}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <select id="selectSelective" parameterType="xuehai.model.QuestionType" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from question_type
+    where 1=1
+    <trim prefix=" " suffix=" ">
+      <if test="id != null">
+       AND id = #{id,jdbcType=BIGINT},
+      </if>
+      <if test="name != null">
+        AND name =  #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="parent != null">
+        AND parent =  #{parent,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </select>
+
 </mapper>

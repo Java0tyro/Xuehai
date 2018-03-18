@@ -1,12 +1,9 @@
 package xuehai.dao;
 
-import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Repository;
-import xuehai.model.Follow;
 import xuehai.model.User;
 
+import java.util.List;
 
-@Repository
 public interface UserMapper {
     int deleteByPrimaryKey(Long id);
 
@@ -16,18 +13,9 @@ public interface UserMapper {
 
     User selectByPrimaryKey(Long id);
 
+    List<User> selectSelective(User user);
+
     int updateByPrimaryKeySelective(User record);
 
     int updateByPrimaryKey(User record);
-
-    User login(@Param("email") String email);
-
-    Long regist(User user);
-
-    User modify(User user);
-
-    Follow follow(@Param("fromId") Long fromId, @Param( "toId") Long toId);
-
-    User deleteUser(Long id);
-
 }

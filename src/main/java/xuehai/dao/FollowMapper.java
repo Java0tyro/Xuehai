@@ -2,6 +2,8 @@ package xuehai.dao;
 
 import xuehai.model.Follow;
 
+import java.util.List;
+
 public interface FollowMapper {
     int deleteByPrimaryKey(Long id);
 
@@ -10,6 +12,7 @@ public interface FollowMapper {
     int insertSelective(Follow record);
 
     Follow selectByPrimaryKey(Long id);
+    List<Follow> selectSelective(Follow follow);
 
     int updateByPrimaryKeySelective(Follow record);
 

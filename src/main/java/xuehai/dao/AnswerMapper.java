@@ -2,6 +2,8 @@ package xuehai.dao;
 
 import xuehai.model.Answer;
 
+import java.util.List;
+
 public interface AnswerMapper {
     int deleteByPrimaryKey(Long id);
 
@@ -10,6 +12,7 @@ public interface AnswerMapper {
     int insertSelective(Answer record);
 
     Answer selectByPrimaryKey(Long id);
+    List<Answer> selectSelective(Answer answer);
 
     int updateByPrimaryKeySelective(Answer record);
 

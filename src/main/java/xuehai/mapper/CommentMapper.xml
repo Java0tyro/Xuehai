@@ -18,7 +18,7 @@
     content
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
-    select 
+    select
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
@@ -37,7 +37,7 @@
       #{parent,jdbcType=BIGINT}, #{time,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR}
       )
   </insert>
-  <insert id="insertSelective" parameterType="xuehai.model.Comment">
+  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="xuehai.model.Comment">
     insert into comment
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -118,4 +118,32 @@
       time = #{time,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <select id="selectSelective" parameterType="xuehai.model.Comment" resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from comment
+    where 1=1
+    <trim prefix=" " suffix=" ">
+      <if test="id != null">
+      AND id =  #{id,jdbcType=BIGINT},
+      </if>
+      <if test="user != null">
+        AND user =  #{user,jdbcType=BIGINT},
+      </if>
+      <if test="answer != null">
+        AND answer = #{answer,jdbcType=BIGINT},
+      </if>
+      <if test="parent != null">
+        AND parent = #{parent,jdbcType=BIGINT},
+      </if>
+      <if test="time != null">
+        AND time =  #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null">
+        AND content =  #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </select>
 </mapper>

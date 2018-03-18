@@ -7,15 +7,8 @@ public class Question implements Serializable {
     private Long id;
 
     private Long user;
+
     private String title;
-
-    public Long getUser() {
-        return user;
-    }
-
-    public void setUser(Long user) {
-        this.user = user;
-    }
 
     private Long type;
 
@@ -35,6 +28,14 @@ public class Question implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getUser() {
+        return user;
+    }
+
+    public void setUser(Long user) {
+        this.user = user;
     }
 
     public String getTitle() {
@@ -98,6 +99,7 @@ public class Question implements Serializable {
         }
         Question other = (Question) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
+            && (this.getUser() == null ? other.getUser() == null : this.getUser().equals(other.getUser()))
             && (this.getTitle() == null ? other.getTitle() == null : this.getTitle().equals(other.getTitle()))
             && (this.getType() == null ? other.getType() == null : this.getType().equals(other.getType()))
             && (this.getAnswerNum() == null ? other.getAnswerNum() == null : this.getAnswerNum().equals(other.getAnswerNum()))
@@ -111,6 +113,7 @@ public class Question implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        result = prime * result + ((getUser() == null) ? 0 : getUser().hashCode());
         result = prime * result + ((getTitle() == null) ? 0 : getTitle().hashCode());
         result = prime * result + ((getType() == null) ? 0 : getType().hashCode());
         result = prime * result + ((getAnswerNum() == null) ? 0 : getAnswerNum().hashCode());
@@ -127,6 +130,7 @@ public class Question implements Serializable {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
+        sb.append(", user=").append(user);
         sb.append(", title=").append(title);
         sb.append(", type=").append(type);
         sb.append(", answerNum=").append(answerNum);
