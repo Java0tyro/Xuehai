@@ -13,6 +13,7 @@ import xuehai.util.MessageType;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -26,7 +27,11 @@ public class UserServiceImpl implements UserService {
     public User login(String email) {
         User user = new User();
         user.setEmail(email);
-        return userMapper.selectSelective(user).get(0);
+        List<User> userList = userMapper.selectSelective(user);
+        if(userList != null ){
+            return userList.get(0);
+        }
+        return null;
     }
 
     @Override
@@ -112,4 +117,5 @@ public class UserServiceImpl implements UserService {
         }
         return 0;
     }
+
 }

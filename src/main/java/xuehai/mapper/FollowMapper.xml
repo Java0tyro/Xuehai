@@ -26,7 +26,7 @@
     values (#{id,jdbcType=BIGINT}, #{userFrom,jdbcType=BIGINT}, #{userTo,jdbcType=BIGINT}, 
       #{time,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="xuehai.model.Follow">
+  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="xuehai.model.Follow">
     insert into follow
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -86,16 +86,16 @@
     where 1=1
     <trim prefix=" " suffix=" ">
       <if test="id != null">
-      AND id = #{id,jdbcType=BIGINT},
+      AND id = #{id,jdbcType=BIGINT}
       </if>
       <if test="userFrom != null">
-      AND userFrom = #{userFrom,jdbcType=BIGINT},
+      AND user_from = #{userFrom,jdbcType=BIGINT}
       </if>
       <if test="userTo != null">
-        AND userTo =  #{userTo,jdbcType=BIGINT},
+        AND user_to =  #{userTo,jdbcType=BIGINT}
       </if>
       <if test="time != null">
-        AND time = #{time,jdbcType=TIMESTAMP},
+        AND time = #{time,jdbcType=TIMESTAMP}
       </if>
     </trim>
   </select>

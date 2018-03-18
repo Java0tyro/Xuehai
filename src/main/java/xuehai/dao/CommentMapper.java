@@ -1,9 +1,11 @@
 package xuehai.dao;
 
+import org.springframework.stereotype.Repository;
 import xuehai.model.Comment;
 
 import java.util.List;
 
+@Repository
 public interface CommentMapper {
     int deleteByPrimaryKey(Long id);
 

@@ -151,28 +151,28 @@
     where 1=1
     <trim prefix=" " suffix=" ">
       <if test="id != null">
-       AND id = #{id,jdbcType=BIGINT},
+       AND id = #{id,jdbcType=BIGINT}
       </if>
       <if test="user != null">
-      AND user =  #{user,jdbcType=BIGINT},
+      AND user =  #{user,jdbcType=BIGINT}
       </if>
       <if test="title != null">
-      AND title =   #{title,jdbcType=VARCHAR},
+      AND title =   #{title,jdbcType=VARCHAR}
       </if>
       <if test="type != null">
-        AND type =  #{type,jdbcType=BIGINT},
+        AND type =  #{type,jdbcType=BIGINT}
       </if>
       <if test="answerNum != null">
-        AND answerNum =  #{answerNum,jdbcType=INTEGER},
+        AND answer_num =  #{answerNum,jdbcType=INTEGER}
       </if>
       <if test="collectionNum != null">
-        AND collectionNum =  #{collectionNum,jdbcType=INTEGER},
+        AND collection_num =  #{collectionNum,jdbcType=INTEGER}
       </if>
       <if test="time != null">
-        AND time =  #{time,jdbcType=TIMESTAMP},
+        AND time =  #{time,jdbcType=TIMESTAMP}
       </if>
       <if test="content != null">
-        AND content =  #{content,jdbcType=LONGVARCHAR},
+        AND content =  #{content,jdbcType=LONGVARCHAR}
       </if>
     </trim>
   </select>
