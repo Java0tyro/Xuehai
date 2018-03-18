@@ -19,6 +19,8 @@ CREATE TABLE `user` (
     `modified_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		`follower` INT NOT NULL DEFAULT 0,
 		`following` INT NOT NULL DEFAULT 0,
+		`question_num` INT NOT NULL DEFAULT 0,
+		`answer_num` INT NOT NULL DEFAULT 0,
     `sex` TINYINT,
     `profile` VARCHAR ( 256 ),
     `school` VARCHAR ( 32 ),
@@ -99,6 +101,7 @@ CREATE TABLE `follow` (
     FOREIGN KEY ( `user_to` ) REFERENCES `user` ( `id` ) ON DELETE CASCADE ON UPDATE CASCADE,
     UNIQUE ( `user_from`, `user_to` ) 
 );
+/*
 -- 消息表（可能不需要）
 CREATE TABLE `message` (
     `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -108,6 +111,9 @@ CREATE TABLE `message` (
     `time` TIMESTAMP NOT NULL,
     FOREIGN KEY ( `user` ) REFERENCES `user` ( `id` ) ON DELETE CASCADE ON UPDATE CASCADE 
 );
+*/
+
+
 
 -- 触发器
 -- 添加回答时，问题回答数+1
