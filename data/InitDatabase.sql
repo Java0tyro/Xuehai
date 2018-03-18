@@ -17,6 +17,8 @@ CREATE TABLE `user` (
     `authority` SMALLINT NOT NULL DEFAULT 0,
     `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `modified_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		`follower` INT NOT NULL DEFAULT 0,
+		`following` INT NOT NULL DEFAULT 0,
     `sex` TINYINT,
     `profile` VARCHAR ( 256 ),
     `school` VARCHAR ( 32 ),
@@ -107,60 +109,159 @@ CREATE TABLE `message` (
     FOREIGN KEY ( `user` ) REFERENCES `user` ( `id` ) ON DELETE CASCADE ON UPDATE CASCADE 
 );
 
--- 视图
--- 关注数
-CREATE VIEW `following` AS 
-    SELECT
-        `a`.`id` AS `id`,
-        COUNT( * ) AS `num` 
-    FROM
-        ( `user` `a` JOIN `follow` `b` ON ( ( `a`.`id` = `b`.`user_from` ) ) ) 
-    GROUP BY
-        `a`.`id`;
--- 被关注数
-CREATE VIEW `follower` AS 
-    SELECT
-        `a`.`id` AS `id`,
-        COUNT( * ) AS `num` 
-    FROM
-        ( `user` `a` JOIN `follow` `b` ON ( ( `a`.`id` = `b`.`user_to` ) ) ) 
-    GROUP BY
-        `a`.`id`;
--- 问题收藏数
-CREATE VIEW `collection_num` AS 
-    SELECT
-        `a`.`id` AS `id`,
-        COUNT( * ) AS `num` 
-    FROM
-        ( `question` `a` JOIN `collection` `b` ON ( ( `a`.`id` = `b`.`question` ) ) ) 
-    GROUP BY
-        `a`.`id`;
--- 问题回答数
-CREATE VIEW `answer_num` AS
-    SELECT
-        `a`.`id` AS `id`,
-        COUNT( * ) AS `num` 
-    FROM
-        ( `question` `a` JOIN `answer` `b` ON ( ( `a`.`id` = `b`.`question` ) ) ) 
-    GROUP BY
-        `a`.`id`;
--- 回答点赞数
-CREATE VIEW `like_num` AS 
-    SELECT
-        `a`.`id` AS `id`,
-        COUNT( * ) AS `num` 
-    FROM
-        ( `answer` `a` JOIN `like` `b` ON ( ( `a`.`id` = `b`.`answer` ) ) ) 
-    GROUP BY
-        `a`.`id`;
--- 评论数
-CREATE VIEW `comment_num` AS 
-    SELECT
-        `a`.`id` AS `id`,
-        COUNT( * ) AS `num` 
-    FROM
-        ( `answer` `a` JOIN `comment` `b` ON ( ( `a`.`id` = `b`.`answer` ) ) ) 
-    GROUP BY
-        `a`.`id`;
+-- 触发器
+-- 添加回答时，问题回答数+1
+DELIMITER $$
+CREATE TRIGGER `add_answer` AFTER INSERT ON `answer` FOR EACH ROW
+BEGIN
+	UPDATE `question` SET `answer_num` = `answer_num` + 1 WHERE `id` = NEW.`question`;
+END;
+$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER `del_answer` AFTER DELETE ON `answer` FOR EACH ROW
+BEGIN
+	UPDATE `question` SET `answer_num` = `answer_num` - 1 WHERE `id` = OLD.`question`;
+END;
+$$
+DELIMITER ;
+
+-- 添加评论时，回答评论数+1
+DELIMITER $$
+CREATE TRIGGER `add_comment` AFTER INSERT ON `comment` FOR EACH ROW
+BEGIN
+	UPDATE `answer` SET `comment_num` = `comment_num` + 1 WHERE `id` = NEW.`answer`;
+END;
+$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER `del_comment` AFTER DELETE ON `comment` FOR EACH ROW
+BEGIN
+	UPDATE `answer` SET `comment_num` = `comment_num` - 1 WHERE `id` = OLD.`answer`;
+END;
+$$
+DELIMITER ;
+
+-- 存储过程
+DELIMITER $$
+
+CREATE PROCEDURE sp_GetTimeline (
+	IN user_id BIGINT,
+	IN index_num INT,
+	IN number INT
+) BEGIN
+DROP TABLE IF EXISTS `temp_timeline`;
+CREATE TEMPORARY TABLE `temp_timeline` (
+	`content1_id` BIGINT,
+	`content1` VARCHAR(128),
+	`content2_id` BIGINT,
+	`content2` VARCHAR(128),
+	`content3_id` BIGINT,
+	`content3` VARCHAR(128),
+	`content_type` INT,
+	`time` TIMESTAMP
+);
+
+-- 获取关注列表
+DROP TABLE IF EXISTS `temp_following`;
+CREATE TEMPORARY TABLE `temp_following` LIKE `user`;
+INSERT INTO `temp_following`
+SELECT *
+FROM `user`
+WHERE `id` IN (
+    SELECT `user_to` FROM `follow` WHERE `user_from` = user_id
+);
+
+
+-- 有了新的关注
+
+INSERT INTO `temp_timeline` (
+    `content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
+)
+SELECT b.id, b.username, user_id, "", a.id, "", 0, a.time
+FROM `follow` `a` INNER JOIN `user` `b` ON ( a.user_from = b.id )
+WHERE a.user_to = user_id;
+
+
+
+
+-- 插入数据：提问有了回答
+INSERT INTO `temp_timeline` (
+	`content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
+)
+SELECT c.id, c.username, a.id, a.title, b.id, b.content, 1, b.time
+FROM `question` `a` INNER JOIN `answer` `b` ON ( `a`.`id` = `b`.`question`) INNER JOIN `user` `c` ON ( `b`.`user` = `c`.`id` )
+WHERE a.`user` = user_id;
+
+-- 插入数据：提问有了收藏
+INSERT INTO `temp_timeline` (
+	`content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
+)
+SELECT c.id, c.username, a.id, a.title, b.id, "", 2, b.time
+FROM `question` `a` INNER JOIN `collection` `b` ON ( `a`.`id` = `b`.`question`) INNER JOIN `user` `c` ON ( `b`.`user` = `c`.`id` )
+WHERE a.`user` = user_id;
+
+
+
+
+-- 插入数据：回答有了评论
+INSERT INTO `temp_timeline` (
+	`content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
+)
+SELECT c.id, c.username, a.id, a.content, b.id, b.content, 3, b.time
+FROM `answer` `a` INNER JOIN `comment` `b` ON ( `a`.`id` = `b`.`answer`) INNER JOIN `user` `c` ON ( `b`.`user` = `c`.`id` )
+WHERE a.`user` = user_id;
+
+-- 插入数据：回答有了点赞
+INSERT INTO `temp_timeline` (
+	`content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
+)
+SELECT c.id, c.username, a.id, a.content, b.id, "", 4, b.time
+FROM `answer` `a` INNER JOIN `like` `b` ON ( `a`.`id` = `b`.`answer`) INNER JOIN `user` `c` ON ( `b`.`user` = `c`.`id` )
+WHERE a.`user` = user_id;
+
+
+
+
+
+-- 插入数据：评论有了评论
+INSERT INTO `temp_timeline` (
+	`content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
+)
+SELECT c.id, c.username, a.id, a.content, b.id, b.content, 5, b.time
+FROM `comment` `a` INNER JOIN `comment` `b` ON ( `a`.`id` = `b`.`parent`) INNER JOIN `user` `c` ON ( `b`.`user` = `c`.`id` )
+WHERE a.`user` = user_id;
+
+
+
+
+-- Following：提问
+INSERT INTO `temp_timeline` (
+	`content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
+)
+SELECT a.id, a.username, 0, "", b.id, b.title, 6, b.time
+FROM temp_following `a` INNER JOIN question `b` ON ( a.id = b.`user` );
+
+
+-- Following：回答
+INSERT INTO `temp_timeline` (
+	`content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
+)
+SELECT a.id, a.username, c.id, c.title, b.id, b.content, 7, b.time
+FROM temp_following `a` INNER JOIN answer `b` ON ( a.id = b.`user` ) INNER JOIN question `c` ON ( c.id = b.question ) ;
+
+
+
+
+-- 返回temp_timeline
+SELECT `content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
+FROM `temp_timeline`
+ORDER BY `time` DESC
+LIMIT index_num, number;
+END;
+$$
+DELIMITER ;
 
 -- 脚本结束
