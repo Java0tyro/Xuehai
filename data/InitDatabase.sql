@@ -1,13 +1,18 @@
 -- 脚本开始
-DROP DATABASE
-IF
-    EXISTS `demo_xuehai`;
 
-CREATE DATABASE `demo_xuehai` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+
+CREATE DATABASE IF NOT EXISTS `demo_xuehai` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `demo_xuehai`;
+
+
+
+-- --------------------------------------------------------------------------
 -- 表
+
+
 -- 用户表
+DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
     `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
     `username` VARCHAR ( 64 ) NOT NULL UNIQUE,
@@ -29,15 +34,20 @@ CREATE TABLE `user` (
     `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `modified_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+
 -- 问题类型表
-CREATE TABLE `question_type` (
+DROP TABLE IF EXISTS question_type;
+CREATE TABLE question_type (
     `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
     `name` VARCHAR ( 10 ) NOT NULL UNIQUE,
-    `parent` BIGINT,
-    FOREIGN KEY ( `parent` ) REFERENCES `question_type` ( `id` ) ON DELETE CASCADE ON UPDATE CASCADE 
+    `parent` BIGINT
 );
+
+
 -- 问题表
-CREATE TABLE `question` (
+DROP TABLE IF EXISTS question;
+CREATE TABLE question (
     `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
     `user` BIGINT,
     `title` VARCHAR ( 64 ) NOT NULL,
@@ -45,12 +55,13 @@ CREATE TABLE `question` (
     `type` BIGINT,
     `answer_num` INT NOT NULL DEFAULT 0,
     `collection_num` INT NOT NULL DEFAULT 0,
-    `time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY ( `user` ) REFERENCES `user` ( `id` ) ON DELETE SET NULL ON UPDATE CASCADE,
-    FOREIGN KEY ( `type` ) REFERENCES `question_type` ( `id` ) ON DELETE SET NULL ON UPDATE CASCADE 
+    `time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
 -- 回答表
-CREATE TABLE `answer` (
+DROP TABLE IF EXISTS answer;
+CREATE TABLE answer (
     `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
     `content` text NOT NULL,
     `user` BIGINT,
@@ -58,85 +69,62 @@ CREATE TABLE `answer` (
     `comment_num` INT NOT NULL DEFAULT 0,
     `question` BIGINT NOT NULL,
     `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `modified_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY ( `user` ) REFERENCES `user` ( `id` ) ON DELETE SET NULL ON UPDATE CASCADE,
-    FOREIGN KEY ( `question` ) REFERENCES `question` ( `id` ) ON DELETE CASCADE ON UPDATE CASCADE 
+    `modified_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+
 -- 评论表
+DROP TABLE IF EXISTS `comment`;
 CREATE TABLE `comment` (
     `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
     `content` text NOT NULL,
     `user` BIGINT,
     `answer` BIGINT NOT NULL,
     `parent` BIGINT,
-    `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY ( `user` ) REFERENCES `user` ( `id` ) ON DELETE SET NULL ON UPDATE CASCADE,
-    FOREIGN KEY ( `answer` ) REFERENCES `answer` ( `id` ) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY ( `parent` ) REFERENCES `comment` ( `id` ) ON DELETE SET NULL ON UPDATE CASCADE 
+    `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+
 -- 收藏表（问题与用户的关系）
-CREATE TABLE `collection` (
+DROP TABLE IF EXISTS collection;
+CREATE TABLE collection (
     `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
     `user` BIGINT NOT NULL,
     `question` BIGINT NOT NULL,
     `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY ( `user` ) REFERENCES `user` ( `id` ) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY ( `question` ) REFERENCES `question` ( `id` ) ON DELETE CASCADE ON UPDATE CASCADE,
     UNIQUE ( `user`, `question` ) 
 );
+
+
 -- 点赞表（回答与用户的关系）
+DROP TABLE IF EXISTS `like`;
 CREATE TABLE `like` (
     `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
     `user` BIGINT NOT NULL,
     `answer` BIGINT NOT NULL,
     `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY ( `user` ) REFERENCES `user` ( `id` ) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY ( `answer` ) REFERENCES `answer` ( `id` ) ON DELETE CASCADE ON UPDATE CASCADE,
     UNIQUE ( `user`, `answer` ) 
 );
+
+
 -- 关注表（用户与用户的关系）
-CREATE TABLE `follow` (
+DROP TABLE IF EXISTS follow;
+CREATE TABLE follow (
     `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
     `user_from` BIGINT NOT NULL,
     `user_to` BIGINT NOT NULL,
     `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY ( `user_from` ) REFERENCES `user` ( `id` ) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY ( `user_to` ) REFERENCES `user` ( `id` ) ON DELETE CASCADE ON UPDATE CASCADE,
     UNIQUE ( `user_from`, `user_to` ) 
 );
-/*
--- 消息表（可能不需要）
-CREATE TABLE `message` (
-    `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
-    `user` BIGINT NOT NULL,
-    `content_type` SMALLINT NOT NULL,
-    `content_id` BIGINT NOT NULL,
-    `time` TIMESTAMP NOT NULL,
-    FOREIGN KEY ( `user` ) REFERENCES `user` ( `id` ) ON DELETE CASCADE ON UPDATE CASCADE 
-);
-*/
 
 
 
+-- --------------------------------------------------------------------------
 -- 触发器
 
--- 添加问题时，提问人问题数+1
-DELIMITER $$
-CREATE TRIGGER `add_question` AFTER INSERT ON `question` FOR EACH ROW
-BEGIN
-	UPDATE `user` SET `question_num` = `question_num` + 1 WHERE `id` = NEW.`user`;
-END;
-$$
-DELIMITER ;
-DELIMITER $$
-CREATE TRIGGER `del_question` AFTER DELETE ON `question` FOR EACH ROW
-BEGIN
-	UPDATE `user` SET `question_num` = `question_num` - 1 WHERE `id` = OLD.`user`;
-END;
-$$
-DELIMITER ;
 
--- 添加回答时，问题回答数+1，回答者回答数+1
+-- 添加回答时：问题回答数+1，回答者回答数+1
+DROP TRIGGER IF EXISTS add_answer;
 DELIMITER $$
 CREATE TRIGGER `add_answer` AFTER INSERT ON `answer` FOR EACH ROW
 BEGIN
@@ -145,36 +133,22 @@ BEGIN
 END;
 $$
 DELIMITER ;
-
+-- 删除回答时：删除回答的评论，删除回答的赞，问题回答数-1，回答者回答数-1，
+DROP TRIGGER IF EXISTS del_answer;
 DELIMITER $$
-CREATE TRIGGER `del_answer` AFTER DELETE ON `answer` FOR EACH ROW
+CREATE TRIGGER `del_answer` BEFORE DELETE ON `answer` FOR EACH ROW
 BEGIN
+	DELETE FROM `comment` WHERE answer = OLD.id;
+	DELETE FROM `like` WHERE answer = OLD.id;
 	UPDATE `question` SET `answer_num` = `answer_num` - 1 WHERE `id` = OLD.`question`;
 	UPDATE `user` SET `answer_num` = `answer_num` - 1 WHERE `id` = OLD.`user`;
 END;
 $$
 DELIMITER ;
 
--- 添加评论时，回答评论数+1，评论者评论数+1
-DELIMITER $$
-CREATE TRIGGER `add_comment` AFTER INSERT ON `comment` FOR EACH ROW
-BEGIN
-	UPDATE `answer` SET `comment_num` = `comment_num` + 1 WHERE `id` = NEW.`answer`;
-	UPDATE `user` SET `comment_num`  = `comment_num` + 1 WHERE `id` = NEW.`user`;
-END;
-$$
-DELIMITER ;
 
-DELIMITER $$
-CREATE TRIGGER `del_comment` AFTER DELETE ON `comment` FOR EACH ROW
-BEGIN
-	UPDATE `answer` SET `comment_num` = `comment_num` - 1 WHERE `id` = OLD.`answer`;
-	UPDATE `user` SET `comment_num`  = `comment_num` - 1 WHERE `id` = OLD.`user`;
-END;
-$$
-DELIMITER ;
-
--- 添加收藏时，问题收藏数+1，收藏数+1
+-- 添加收藏时：问题收藏数+1，用户收藏数+1
+DROP TRIGGER IF EXISTS add_collection;
 DELIMITER $$
 CREATE TRIGGER `add_collection` AFTER INSERT ON `collection` FOR EACH ROW
 BEGIN
@@ -183,8 +157,10 @@ BEGIN
 END;
 $$
 DELIMITER ;
+-- 删除收藏时：问题收藏数-1，用户收藏数-1
+DROP TRIGGER IF EXISTS del_collection;
 DELIMITER $$
-CREATE TRIGGER `del_collection` AFTER DELETE ON `collection` FOR EACH ROW
+CREATE TRIGGER `del_collection` BEGIN DELETE ON `collection` FOR EACH ROW
 BEGIN
 	UPDATE `question` SET collection_num = collection_num - 1 WHERE `id` = OLD.question;
 	UPDATE `user` SET collection_num = collection_num - 1 WHERE `id` = OLD.`user`;
@@ -192,25 +168,32 @@ END;
 $$
 DELIMITER ;
 
--- 添加赞时，回答赞数+1，回答者赞数+1
+
+-- 添加评论时：回答评论数+1，评论者评论数+1
+DROP TRIGGER IF EXISTS add_comment;
 DELIMITER $$
-CREATE TRIGGER `add_like` AFTER INSERT ON `like` FOR EACH ROW
+CREATE TRIGGER `add_comment` AFTER INSERT ON `comment` FOR EACH ROW
 BEGIN
-	UPDATE `answer` SET like_num = like_num + 1 WHERE `id` = NEW.answer;
-	UPDATE `user` SET like_num = like_num + 1 WHERE `id` IN ( SELECT `user` FROM `answer` WHERE `id` = NEW.answer ) ;
+	UPDATE `answer` SET `comment_num` = `comment_num` + 1 WHERE `id` = NEW.`answer`;
+	UPDATE `user` SET `comment_num`  = `comment_num` + 1 WHERE `id` = NEW.`user`;
 END;
 $$
 DELIMITER ;
+-- 删除评论时：引用改评论的parent字段置为NULL，回答评论数-1，评论者评论数-1
+DROP TRIGGER IF EXISTS del_comment;
 DELIMITER $$
-CREATE TRIGGER `del_like` AFTER DELETE ON `like` FOR EACH ROW
+CREATE TRIGGER `del_comment` BEFORE DELETE ON `comment` FOR EACH ROW
 BEGIN
-	UPDATE `answer` SET like_num = like_num - 1 WHERE `id` = OLD.answer;
-	UPDATE `user` SET like_num = like_num - 1 WHERE `id` IN ( SELECT `user` FROM `answer` WHERE `id` = OLD.answer ) ;
+	UPDATE `comment` SET parent = NULL WHERE parent = OLD.id;
+	UPDATE `answer` SET `comment_num` = `comment_num` - 1 WHERE `id` = OLD.`answer`;
+	UPDATE `user` SET `comment_num`  = `comment_num` - 1 WHERE `id` = OLD.`user`;
 END;
 $$
 DELIMITER ;
 
--- 添加关注时，关注数+1， 被关注人关注数+1
+
+-- 添加关注时：following+1， 被关注人follower+1
+DROP TRIGGER IF EXISTS add_follow;
 DELIMITER $$
 CREATE TRIGGER `add_follow` AFTER INSERT ON `follow` FOR EACH ROW
 BEGIN
@@ -219,8 +202,10 @@ BEGIN
 END;
 $$
 DELIMITER ;
+-- 删除关注时：folloing-1，被关注人follower-1
+DROP TRIGGER IF EXISTS del_follow;
 DELIMITER $$
-CREATE TRIGGER `del_follow` AFTER DELETE ON `follow` FOR EACH ROW
+CREATE TRIGGER `del_follow` BEFORE DELETE ON `follow` FOR EACH ROW
 BEGIN
 	UPDATE `user` SET following = following - 1 WHERE `id` = OLD.user_from;
 	UPDATE `user` SET follower = follower - 1 WHERE `id` = OLD.user_to;
@@ -229,12 +214,72 @@ $$
 DELIMITER ;
 
 
-
-
-
--- 存储过程
+-- 添加赞时：回答赞数+1，回答者赞数+1
+DROP TRIGGER IF EXISTS add_like;
 DELIMITER $$
+CREATE TRIGGER `add_like` AFTER INSERT ON `like` FOR EACH ROW
+BEGIN
+	UPDATE `answer` SET like_num = like_num + 1 WHERE `id` = NEW.answer;
+	UPDATE `user` SET like_num = like_num + 1 WHERE `id` IN ( SELECT `user` FROM `answer` WHERE `id` = NEW.answer ) ;
+END;
+$$
+DELIMITER ;
+-- 添加赞时：回答赞数-1，回答者赞数-1
+DROP TRIGGER IF EXISTS del_like;
+DELIMITER $$
+CREATE TRIGGER `del_like` BEFORE DELETE ON `like` FOR EACH ROW
+BEGIN
+	UPDATE `answer` SET like_num = like_num - 1 WHERE `id` = OLD.answer;
+	UPDATE `user` SET like_num = like_num - 1 WHERE `id` IN ( SELECT `user` FROM `answer` WHERE `id` = OLD.answer ) ;
+END;
+$$
+DELIMITER ;
 
+
+
+-- 添加问题时：提问人问题数+1
+DROP TRIGGER IF EXISTS add_question;
+DELIMITER $$
+CREATE TRIGGER `add_question` AFTER INSERT ON `question` FOR EACH ROW
+BEGIN
+	UPDATE `user` SET `question_num` = `question_num` + 1 WHERE `id` = NEW.`user`;
+END;
+$$
+DELIMITER ;
+-- 删除问题时：对应回答的question字段置为NULL，提问人问题数-1
+DROP TRIGGER IF EXISTS del_question;
+DELIMITER $$
+CREATE TRIGGER `del_question` BEFORE DELETE ON `question` FOR EACH ROW
+BEGIN
+	UPDATE answer SET question = NULL WHERE question = OLD.id;
+	UPDATE `user` SET `question_num` = `question_num` - 1 WHERE `id` = OLD.`user`;
+END;
+$$
+DELIMITER ;
+
+
+-- 删除用户时：answer表user字段置为NULL，collection表删除对应记录，
+-- comment表user字段置为NULL，follow表删除对应记录，like表删除对应记录
+-- question表user字段置为NULL
+DROP TRIGGER IF EXISTS del_user;
+DELIMITER $$
+CREATE TRIGGER del_user BEFORE DELETE ON `user` FOR EACH ROW
+BEGIN
+	UPDATE answer SET `user` = NULL WHERE `user` = OLD.id;
+	UPDATE `comment` SET `user` = NULL WHERE `user` = OLD.id;
+	UPDATE question SET `user` = NULL WHERE `user` = OLD.id;
+	DELETE FROM collection WHERE `user` = OLD.id;
+	DELETE FROM follow WHERE `user_to` = OLD.id OR `user_from` = OLD.id;
+	DELETE FROM `like` WHERE `user` = OLD.id;
+END;
+$$
+DELIMITER ;
+
+
+-- --------------------------------------------------------------------------
+-- 存储过程
+DROP PROCEDURE IF EXISTS sp_GetTimeline;
+DELIMITER $$
 CREATE PROCEDURE sp_GetTimeline (
 	IN user_id BIGINT,
 	IN index_num INT,
@@ -358,8 +403,6 @@ FROM temp_following `a` INNER JOIN `like` `b` ON ( a.id = b.`user` ) INNER JOIN 
 
 
 
-
-
 -- 返回temp_timeline
 SELECT `content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
 FROM `temp_timeline`
@@ -369,4 +412,9 @@ END;
 $$
 DELIMITER ;
 
+
+
+
+
+-- --------------------------------------------------------------------------
 -- 脚本结束
