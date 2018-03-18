@@ -259,6 +259,23 @@ SELECT a.id, a.username, c.id, c.title, b.id, b.content, 7, b.time
 FROM temp_following `a` INNER JOIN answer `b` ON ( a.id = b.`user` ) INNER JOIN question `c` ON ( c.id = b.question ) ;
 
 
+-- Following：收藏
+INSERT INTO temp_timeline (
+	`content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
+)
+SELECT a.id, a.username, c.id, c.title, b.id, "", 8, b.time
+FROM temp_following `a` INNER JOIN collection `b` ON ( a.id = b.`user` ) INNER JOIN question `c` ON ( b.question = c.id );
+
+
+-- Following：点赞
+INSERT INTO temp_timeline (
+	`content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
+)
+SELECT a.id, a.username, c.id, c.content, b.id, "", 9, b.time
+FROM temp_following `a` INNER JOIN `like` `b` ON ( a.id = b.`user` ) INNER JOIN answer `c` ON ( b.answer = c.id );
+
+
+
 
 
 -- 返回temp_timeline
