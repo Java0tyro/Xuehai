@@ -1,5 +1,5 @@
-
 -- 密码 1234
+USE demo_xuehai;
 
 INSERT INTO user ( username, `password`,  salt, email) VALUES ("admin1", "312433c28349f63c4f387953ff337046e794bea0f9b9ebfcb08e90046ded9c76", "asdf", "admin1@admin");
 INSERT INTO user ( username, `password`,  salt, email) VALUES ("admin2", "312433c28349f63c4f387953ff337046e794bea0f9b9ebfcb08e90046ded9c76", "asdf", "admin2@admin");
@@ -14,12 +14,12 @@ INSERT INTO question_type ( `name`, parent ) VALUES ( "type2" , 1);
 INSERT INTO question_type ( `name`, parent ) VALUES ( "type3" , 2);
 INSERT INTO question_type ( `name` ) VALUES ( "type4" );
 
-INSERT INTO question ( `user`, title, content ) VALUES ( 1, "question1", "question1" );
-INSERT INTO question ( `user`, title, content ) VALUES ( 2, "question2", "question2" );
-INSERT INTO question ( `user`, title, content ) VALUES ( 3, "question3", "question3" );
-INSERT INTO question ( `user`, title, content ) VALUES ( 4, "question4", "question4" );
-INSERT INTO question ( `user`, title, content ) VALUES ( 5, "question5", "question5" );
-INSERT INTO question ( `user`, title, content ) VALUES ( 1, "question11", "question11" );
+INSERT INTO question ( `user`, title, content, type ) VALUES ( 1, "question1", "question1", 1);
+INSERT INTO question ( `user`, title, content, type ) VALUES ( 2, "question2", "question2", 2);
+INSERT INTO question ( `user`, title, content, type ) VALUES ( 3, "question3", "question3", 3);
+INSERT INTO question ( `user`, title, content, type ) VALUES ( 4, "question4", "question4", 1);
+INSERT INTO question ( `user`, title, content, type ) VALUES ( 5, "question5", "question5", 4);
+INSERT INTO question ( `user`, title, content, type ) VALUES ( 1, "question11", "question11", 3);
 
 INSERT INTO answer ( `user`, question, content ) VALUES ( 2, 1, "answer1" );
 INSERT INTO answer ( `user`, question, content ) VALUES ( 3, 1, "answer2" );
