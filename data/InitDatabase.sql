@@ -15,16 +15,19 @@ CREATE TABLE `user` (
     `salt` VARCHAR ( 32 ) NOT NULL,
     `email` VARCHAR ( 64 ) NOT NULL UNIQUE,
     `authority` SMALLINT NOT NULL DEFAULT 0,
-    `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `modified_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		`follower` INT NOT NULL DEFAULT 0,
 		`following` INT NOT NULL DEFAULT 0,
 		`question_num` INT NOT NULL DEFAULT 0,
 		`answer_num` INT NOT NULL DEFAULT 0,
+		`collection_num` INT NOT NULL DEFAULT 0,
+		`like_num` INT NOT NULL DEFAULT 0,
+		`comment_num` INT NOT NULL DEFAULT 0,
     `sex` TINYINT,
     `profile` VARCHAR ( 256 ),
     `school` VARCHAR ( 32 ),
-    `major` VARCHAR ( 32 ) 
+    `major` VARCHAR ( 32 ),
+    `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `modified_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 -- 问题类型表
 CREATE TABLE `question_type` (
@@ -116,11 +119,29 @@ CREATE TABLE `message` (
 
 
 -- 触发器
--- 添加回答时，问题回答数+1
+
+-- 添加问题时，提问人问题数+1
+DELIMITER $$
+CREATE TRIGGER `add_question` AFTER INSERT ON `question` FOR EACH ROW
+BEGIN
+	UPDATE `user` SET `question_num` = `question_num` + 1 WHERE `id` = NEW.`user`;
+END;
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `del_question` AFTER DELETE ON `question` FOR EACH ROW
+BEGIN
+	UPDATE `user` SET `question_num` = `question_num` - 1 WHERE `id` = OLD.`user`;
+END;
+$$
+DELIMITER ;
+
+-- 添加回答时，问题回答数+1，回答者回答数+1
 DELIMITER $$
 CREATE TRIGGER `add_answer` AFTER INSERT ON `answer` FOR EACH ROW
 BEGIN
 	UPDATE `question` SET `answer_num` = `answer_num` + 1 WHERE `id` = NEW.`question`;
+	UPDATE `user` SET `answer_num` = `answer_num` + 1 WHERE `id` = NEW.`user`;
 END;
 $$
 DELIMITER ;
@@ -129,15 +150,17 @@ DELIMITER $$
 CREATE TRIGGER `del_answer` AFTER DELETE ON `answer` FOR EACH ROW
 BEGIN
 	UPDATE `question` SET `answer_num` = `answer_num` - 1 WHERE `id` = OLD.`question`;
+	UPDATE `user` SET `answer_num` = `answer_num` - 1 WHERE `id` = OLD.`user`;
 END;
 $$
 DELIMITER ;
 
--- 添加评论时，回答评论数+1
+-- 添加评论时，回答评论数+1，评论者评论数+1
 DELIMITER $$
 CREATE TRIGGER `add_comment` AFTER INSERT ON `comment` FOR EACH ROW
 BEGIN
 	UPDATE `answer` SET `comment_num` = `comment_num` + 1 WHERE `id` = NEW.`answer`;
+	UPDATE `user` SET `comment_num`  = `comment_num` + 1 WHERE `id` = NEW.`user`;
 END;
 $$
 DELIMITER ;
@@ -146,9 +169,68 @@ DELIMITER $$
 CREATE TRIGGER `del_comment` AFTER DELETE ON `comment` FOR EACH ROW
 BEGIN
 	UPDATE `answer` SET `comment_num` = `comment_num` - 1 WHERE `id` = OLD.`answer`;
+	UPDATE `user` SET `comment_num`  = `comment_num` - 1 WHERE `id` = OLD.`user`;
 END;
 $$
 DELIMITER ;
+
+-- 添加收藏时，问题收藏数+1，收藏数+1
+DELIMITER $$
+CREATE TRIGGER `add_collection` AFTER INSERT ON `collection` FOR EACH ROW
+BEGIN
+	UPDATE `question` SET collection_num = collection_num + 1 WHERE `id` = NEW.question;
+	UPDATE `user` SET collection_num = collection_num + 1 WHERE `id` = NEW.`user`;
+END;
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `del_collection` AFTER DELETE ON `collection` FOR EACH ROW
+BEGIN
+	UPDATE `question` SET collection_num = collection_num - 1 WHERE `id` = OLD.question;
+	UPDATE `user` SET collection_num = collection_num - 1 WHERE `id` = OLD.`user`;
+END;
+$$
+DELIMITER ;
+
+-- 添加赞时，回答赞数+1，回答者赞数+1
+DELIMITER $$
+CREATE TRIGGER `add_like` AFTER INSERT ON `like` FOR EACH ROW
+BEGIN
+	UPDATE `answer` SET like_num = like_num + 1 WHERE `id` = NEW.answer;
+	UPDATE `user` SET like_num = like_num + 1 WHERE `id` IN ( SELECT `user` FROM `answer` WHERE `id` = NEW.answer ) ;
+END;
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `del_like` AFTER DELETE ON `like` FOR EACH ROW
+BEGIN
+	UPDATE `answer` SET like_num = like_num - 1 WHERE `id` = OLD.answer;
+	UPDATE `user` SET like_num = like_num - 1 WHERE `id` IN ( SELECT `user` FROM `answer` WHERE `id` = OLD.answer ) ;
+END;
+$$
+DELIMITER ;
+
+-- 添加关注时，关注数+1， 被关注人关注数+1
+DELIMITER $$
+CREATE TRIGGER `add_follow` AFTER INSERT ON `follow` FOR EACH ROW
+BEGIN
+	UPDATE `user` SET following = following + 1 WHERE `id` = NEW.user_from;
+	UPDATE `user` SET follower = follower + 1 WHERE `id` = NEW.user_to;
+END;
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `del_follow` AFTER DELETE ON `follow` FOR EACH ROW
+BEGIN
+	UPDATE `user` SET following = following - 1 WHERE `id` = OLD.user_from;
+	UPDATE `user` SET follower = follower - 1 WHERE `id` = OLD.user_to;
+END;
+$$
+DELIMITER ;
+
+
+
+
 
 -- 存储过程
 DELIMITER $$
@@ -257,6 +339,23 @@ INSERT INTO `temp_timeline` (
 )
 SELECT a.id, a.username, c.id, c.title, b.id, b.content, 7, b.time
 FROM temp_following `a` INNER JOIN answer `b` ON ( a.id = b.`user` ) INNER JOIN question `c` ON ( c.id = b.question ) ;
+
+
+-- Following：收藏
+INSERT INTO temp_timeline (
+	`content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
+)
+SELECT a.id, a.username, c.id, c.title, b.id, "", 8, b.time
+FROM temp_following `a` INNER JOIN collection `b` ON ( a.id = b.`user` ) INNER JOIN question `c` ON ( b.question = c.id );
+
+
+-- Following：点赞
+INSERT INTO temp_timeline (
+	`content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
+)
+SELECT a.id, a.username, c.id, c.content, b.id, "", 9, b.time
+FROM temp_following `a` INNER JOIN `like` `b` ON ( a.id = b.`user` ) INNER JOIN answer `c` ON ( b.answer = c.id );
+
 
 
 
