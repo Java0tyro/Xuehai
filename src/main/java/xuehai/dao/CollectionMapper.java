@@ -1,9 +1,11 @@
 package xuehai.dao;
 
+import org.springframework.stereotype.Repository;
 import xuehai.model.Collection;
 
 import java.util.List;
 
+@Repository
 public interface CollectionMapper {
     int deleteByPrimaryKey(Long id);
 

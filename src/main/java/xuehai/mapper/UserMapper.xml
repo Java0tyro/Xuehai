@@ -228,52 +228,52 @@
     where 1=1
     <trim prefix=" " suffix=" ">
       <if test="id != null">
-       AND id = #{id,jdbcType=BIGINT},
+       AND id = #{id,jdbcType=BIGINT}
       </if>
       <if test="username != null">
-      AND username =  #{username,jdbcType=VARCHAR},
+      AND username =  #{username,jdbcType=VARCHAR}
       </if>
       <if test="password != null">
-      AND password = #{password,jdbcType=VARCHAR},
+      AND password = #{password,jdbcType=VARCHAR}
       </if>
       <if test="salt != null">
-       AND salt =  #{salt,jdbcType=VARCHAR},
+       AND salt =  #{salt,jdbcType=VARCHAR}
       </if>
       <if test="email != null">
-      AND email = #{email,jdbcType=VARCHAR},
+      AND email = #{email,jdbcType=VARCHAR}
       </if>
       <if test="authority != null">
-      AND authority =  #{authority,jdbcType=SMALLINT},
+      AND authority =  #{authority,jdbcType=SMALLINT}
       </if>
       <if test="time != null">
-        AND time = #{time,jdbcType=TIMESTAMP},
+        AND time = #{time,jdbcType=TIMESTAMP}
       </if>
       <if test="modifiedTime != null">
-        AND modifiedTime =  #{modifiedTime,jdbcType=TIMESTAMP},
+        AND modified_time =  #{modifiedTime,jdbcType=TIMESTAMP}
       </if>
       <if test="follower != null">
-        AND follower = #{follower,jdbcType=INTEGER},
+        AND follower = #{follower,jdbcType=INTEGER}
       </if>
       <if test="following != null">
-       AND following = #{following,jdbcType=INTEGER},
+       AND following = #{following,jdbcType=INTEGER}
       </if>
       <if test="questionNum != null">
-      AND questionNum =  #{questionNum,jdbcType=INTEGER},
+      AND question_num =  #{questionNum,jdbcType=INTEGER}
       </if>
       <if test="answerNum != null">
-        AND answerNum = #{answerNum,jdbcType=INTEGER},
+        AND answer_num = #{answerNum,jdbcType=INTEGER}
       </if>
       <if test="sex != null">
-        AND sex = #{sex,jdbcType=TINYINT},
+        AND sex = #{sex,jdbcType=TINYINT}
       </if>
       <if test="profile != null">
-        AND sprofile = #{profile,jdbcType=VARCHAR},
+        AND sprofile = #{profile,jdbcType=VARCHAR}
       </if>
       <if test="school != null">
-        AND school = #{school,jdbcType=VARCHAR},
+        AND school = #{school,jdbcType=VARCHAR}
       </if>
       <if test="major != null">
-        AND major =  #{major,jdbcType=VARCHAR},
+        AND major =  #{major,jdbcType=VARCHAR}
       </if>
     </trim>
   </select>

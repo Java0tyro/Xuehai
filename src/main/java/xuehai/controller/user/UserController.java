@@ -51,7 +51,6 @@ public class UserController {
 
         if(strResult != null && strResult.equals(user.getPassword())){
             SessionUtil.addInformation(httpServletRequest, user);
-            System.out.println(email + " 1" + password);
             return registVo.getRedirectUrl();
         }
         return null;

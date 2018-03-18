@@ -144,35 +144,35 @@
   </update>
   <select id="selectSelective" parameterType="xuehai.model.Answer" resultMap="ResultMapWithBLOBs">
     select
-    <include refid="Base_column_List"/>
+    <include refid="Base_Column_List"/>
     ,
     <include refid="Blob_Column_List" />
     from answer
     where 1=1
     <trim prefix=" " suffix=" ">
       <if test="id != null">
-      AND id =  #{id,jdbcType=BIGINT},
+      AND id =  #{id,jdbcType=BIGINT}
       </if>
       <if test="user != null">
-        AND user = #{user,jdbcType=BIGINT},
+        AND user = #{user,jdbcType=BIGINT}
       </if>
       <if test="likeNum != null">
-        AND likeNum = #{likeNum,jdbcType=INTEGER},
+        AND like_num = #{likeNum,jdbcType=INTEGER}
       </if>
       <if test="commentNum != null">
-        AND commentNum =  #{commentNum,jdbcType=INTEGER},
+        AND comment_num =  #{commentNum,jdbcType=INTEGER}
       </if>
       <if test="question != null">
-        AND question =#{question,jdbcType=BIGINT},
+        AND question =#{question,jdbcType=BIGINT}
       </if>
       <if test="time != null">
-        AND time = #{time,jdbcType=TIMESTAMP},
+        AND time = #{time,jdbcType=TIMESTAMP}
       </if>
       <if test="modifiedTime != null">
-        AND modifiedTime = #{modifiedTime,jdbcType=TIMESTAMP},
+        AND modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
       </if>
       <if test="content != null">
-        AND content = #{content,jdbcType=LONGVARCHAR},
+        AND content = #{content,jdbcType=LONGVARCHAR}
       </if>
     </trim>
   </select>

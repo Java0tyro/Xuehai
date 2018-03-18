@@ -1,9 +1,11 @@
 package xuehai.dao;
 
+import org.springframework.stereotype.Repository;
 import xuehai.model.Like;
 
 import java.util.List;
 
+@Repository
 public interface LikeMapper {
     int deleteByPrimaryKey(Long id);
 

@@ -1,9 +1,11 @@
 package xuehai.dao;
 
+import org.springframework.stereotype.Repository;
 import xuehai.model.User;
 
 import java.util.List;
 
+@Repository
 public interface UserMapper {
     int deleteByPrimaryKey(Long id);
 
