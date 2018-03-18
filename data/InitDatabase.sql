@@ -20,13 +20,6 @@ CREATE TABLE `user` (
     `salt` VARCHAR ( 32 ) NOT NULL,
     `email` VARCHAR ( 64 ) NOT NULL UNIQUE,
     `authority` SMALLINT NOT NULL DEFAULT 0,
-		`follower` INT NOT NULL DEFAULT 0,
-		`following` INT NOT NULL DEFAULT 0,
-		`question_num` INT NOT NULL DEFAULT 0,
-		`answer_num` INT NOT NULL DEFAULT 0,
-		`collection_num` INT NOT NULL DEFAULT 0,
-		`like_num` INT NOT NULL DEFAULT 0,
-		`comment_num` INT NOT NULL DEFAULT 0,
     `sex` TINYINT,
     `profile` VARCHAR ( 256 ),
     `school` VARCHAR ( 32 ),
@@ -54,8 +47,6 @@ CREATE TABLE question (
     `title` VARCHAR ( 64 ) NOT NULL,
     `content` TEXT NOT NULL,
     `type` BIGINT,
-    `answer_num` INT NOT NULL DEFAULT 0,
-    `collection_num` INT NOT NULL DEFAULT 0,
     `time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -66,8 +57,6 @@ CREATE TABLE answer (
     `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
     `content` text NOT NULL,
     `user` BIGINT,
-    `like_num` INT NOT NULL DEFAULT 0,
-    `comment_num` INT NOT NULL DEFAULT 0,
     `question` BIGINT NOT NULL,
     `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `modified_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -256,8 +245,20 @@ END;
 $$
 DELIMITER ;
 
-
-
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_DeleteUser ;
+CREATE PROCEDURE sp_DeleteUser (IN user_id BIGINT)
+BEGIN
+	UPDATE answer SET `user` = NULL WHERE `user` = user_id;
+	UPDATE collection SET `user` = NULL WHERE `user` = user_id;
+	UPDATE `comment` SET `user` = NULL WHERE `user` = user_id;
+	DELETE FROM follow WHERE user_to = user_id OR user_from = user_id;
+	DELETE FROM `like` WHERE `user` = user_id;
+	UPDATE question SET `user` = NULL WHERE `user` = user_id;
+	DELETE FROM `user` WHERE id = user_id;
+END;
+$$
+DELIMITER ;
 
 
 -- --------------------------------------------------------------------------
