@@ -8,7 +8,7 @@ public class Message implements Serializable {
 
     private Long user;
 
-    private Short contentType;
+    private Integer contentType;
 
     private Long contentId;
 
@@ -32,11 +32,11 @@ public class Message implements Serializable {
         this.user = user;
     }
 
-    public Short getContentType() {
+    public Integer getContentType() {
         return contentType;
     }
 
-    public void setContentType(Short contentType) {
+    public void setContentType(Integer contentType) {
         this.contentType = contentType;
     }
 

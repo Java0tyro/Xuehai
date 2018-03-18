@@ -15,6 +15,8 @@
     <result column="school" jdbcType="VARCHAR" property="school" />
     <result column="major" jdbcType="VARCHAR" property="major" />
   </resultMap>
+
+
   <sql id="Base_Column_List">
     id, username, password, salt, email, authority, time, modified_time, sex, profile, 
     school, major
@@ -41,7 +43,7 @@
       #{profile,jdbcType=VARCHAR}, #{school,jdbcType=VARCHAR}, #{major,jdbcType=VARCHAR}
       )
   </insert>
-  <insert id="insertSelective" parameterType="xuehai.model.User">
+  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="xuehai.model.User">
     insert into user
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -119,6 +121,7 @@
         #{major,jdbcType=VARCHAR},
       </if>
     </trim>
+
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="xuehai.model.User">
     update user
@@ -189,6 +192,35 @@
       #{time,jdbcType=TIMESTAMP}, #{modifiedTime,jdbcType=TIMESTAMP}, #{sex,jdbcType=TINYINT},
       #{profile,jdbcType=VARCHAR}, #{school,jdbcType=VARCHAR}, #{major,jdbcType=VARCHAR}
       )
+  </insert>
+
+  <select id="login" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    id, username, password, salt, email, authority, time, modified_time, sex, profile,
+    school, major
+    from user
+    where email = #{email,jdbcType=VARCHAR}
+  </select>
+
+  <update id="modify" parameterType="java.lang.Long">
+    UPDATE user
+    set username = #{username,jdbcType=VARCHAR},
+    password = #{password,jdbcType=VARCHAR},
+    salt = #{salt,jdbcType=VARCHAR},
+    email = #{email,jdbcType=VARCHAR},
+    modified_time = #{modifiedTime,jdbcType=TIMESTAMP},
+    sex = #{sex,jdbcType=TINYINT},
+    profile = #{profile,jdbcType=VARCHAR},
+    school = #{school,jdbcType=VARCHAR},
+    major = #{major,jdbcType=VARCHAR}
+  WHERE id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <insert id="follow" parameterType="xuehai.model.Follow">
+    <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+      SELECT  LAST_INSERT_ID() AS id
+    </selectKey>
+    INSERT into follow(user_from, user_to) VALUES(#{userFrom}, #{userTo})
   </insert>
 
 

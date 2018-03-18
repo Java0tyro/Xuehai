@@ -3,6 +3,7 @@
 <mapper namespace="xuehai.dao.QuestionMapper">
   <resultMap id="BaseResultMap" type="xuehai.model.Question">
     <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="user" jdbcType="BIGINT" property="user"/>
     <result column="title" jdbcType="VARCHAR" property="title" />
     <result column="type" jdbcType="BIGINT" property="type" />
     <result column="answer_num" jdbcType="INTEGER" property="answerNum" />
@@ -13,7 +14,7 @@
     <result column="content" jdbcType="LONGVARCHAR" property="content" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, title, type, answer_num, collection_num, time
+    id, user, title, type, answer_num, collection_num, time
   </sql>
   <sql id="Blob_Column_List">
     content
@@ -38,11 +39,14 @@
       #{answerNum,jdbcType=INTEGER}, #{collectionNum,jdbcType=INTEGER}, #{time,jdbcType=TIMESTAMP}, 
       #{content,jdbcType=LONGVARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="xuehai.model.Question">
+  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="xuehai.model.Question">
     insert into question
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
+      </if>
+      <if test="user != null">
+        user,
       </if>
       <if test="title != null">
         title,
@@ -66,6 +70,9 @@
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
         #{id,jdbcType=BIGINT},
+      </if>
+      <if test="user != null">
+        #{user,jdbcType=BIGINT},
       </if>
       <if test="title != null">
         #{title,jdbcType=VARCHAR},

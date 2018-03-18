@@ -12,5 +12,5 @@ public interface UserService {
 
     Follow follow(Long fromId, Long toId);
 
-    User deleteUser(Long id);
+    int deleteUser(Long id);
 }

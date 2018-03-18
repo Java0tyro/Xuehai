@@ -20,13 +20,15 @@ public interface UserMapper {
 
     int updateByPrimaryKey(User record);
 
-    User login(@Param("email") String email);
+    //-------------------------------------------
+
+    User login(String email);
 
     Long regist(User user);
 
-    User modify(User user);
+    int modify(User user);
 
-    Follow follow(@Param("fromId") Long fromId, @Param( "toId") Long toId);
+    int follow(Follow follow);
 
     User deleteUser(Long id);
 

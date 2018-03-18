@@ -14,7 +14,7 @@ public class User implements Serializable {
 
     private String email;
 
-    private Short authority;
+    private Integer authority;
 
     private Date time;
 
@@ -70,11 +70,11 @@ public class User implements Serializable {
         this.email = email == null ? null : email.trim();
     }
 
-    public Short getAuthority() {
+    public Integer getAuthority() {
         return authority;
     }
 
-    public void setAuthority(Short authority) {
+    public void setAuthority(Integer authority) {
         this.authority = authority;
     }
 
