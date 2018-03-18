@@ -2,6 +2,8 @@ package xuehai.dao;
 
 import xuehai.model.Collection;
 
+import java.util.List;
+
 public interface CollectionMapper {
     int deleteByPrimaryKey(Long id);
 
@@ -10,6 +12,7 @@ public interface CollectionMapper {
     int insertSelective(Collection record);
 
     Collection selectByPrimaryKey(Long id);
+    List<Collection> selectSelective(Collection collection);
 
     int updateByPrimaryKeySelective(Collection record);
 

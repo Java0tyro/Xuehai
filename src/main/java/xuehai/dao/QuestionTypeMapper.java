@@ -2,6 +2,8 @@ package xuehai.dao;
 
 import xuehai.model.QuestionType;
 
+import java.util.List;
+
 public interface QuestionTypeMapper {
     int deleteByPrimaryKey(Long id);
 
@@ -10,6 +12,8 @@ public interface QuestionTypeMapper {
     int insertSelective(QuestionType record);
 
     QuestionType selectByPrimaryKey(Long id);
+
+    List<QuestionType> selectSelective(QuestionType questionType);
 
     int updateByPrimaryKeySelective(QuestionType record);
 

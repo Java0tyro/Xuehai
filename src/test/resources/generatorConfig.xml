@@ -20,7 +20,7 @@
         </commentGenerator>
         <!--数据库链接URL，用户名、密码 -->
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://localhost/demo" userId="root" password="root">
+                        connectionURL="jdbc:mysql://localhost/demo_xuehai" userId="root" password="root">
         </jdbcConnection>
         <javaTypeResolver>
             <!-- This property is used to specify whether MyBatis Generator should 

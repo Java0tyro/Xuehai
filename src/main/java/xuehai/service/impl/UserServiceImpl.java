@@ -1,10 +1,8 @@
 package xuehai.service.impl;
 
 import xuehai.dao.FollowMapper;
-import xuehai.dao.MessageMapper;
 import xuehai.dao.UserMapper;
 import xuehai.model.Follow;
-import xuehai.model.Message;
 import xuehai.model.User;
 import xuehai.service.UserService;
 import xuehai.util.ByteToString;
@@ -24,12 +22,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private FollowMapper followMapper;
 
-    @Autowired
-    private MessageMapper messageMapper;
-
     @Override
     public User login(String email) {
-        return userMapper.login(email);
+        User user = new User();
+        user.setEmail(email);
+        return userMapper.selectSelective(user).get(0);
     }
 
     @Override
@@ -54,12 +51,12 @@ public class UserServiceImpl implements UserService {
         user.setSalt(salt);
         user.setPassword(strResult);
         int num = userMapper.insertSelective(user);
-        //System.out.println(user.getId());
         user = userMapper.selectByPrimaryKey(user.getId());
-        //System.out.println(user);
-        return user;
+        if(num != 0){
+            return user;
+        }
+        return null;
     }
-
 
     @Override
     public User modify(User user) {
@@ -84,7 +81,6 @@ public class UserServiceImpl implements UserService {
             user.setSalt(salt);
             user.setPassword(strResult);
         }
-
         user.setModifiedTime(new Date());
         int result = userMapper.updateByPrimaryKeySelective(user);
         if(result == 0){
@@ -99,19 +95,12 @@ public class UserServiceImpl implements UserService {
         Follow follow = new Follow();
         follow.setUserFrom(fromId);
         follow.setUserTo(toId);
-        int followNum = userMapper.follow(follow);
+        int followNum = followMapper.insertSelective(follow);
         Follow follow1 = followMapper.selectByPrimaryKey(follow.getId());
-        //推送
-        Message message = new Message();
-        message.setUser(toId);
-        message.setContentType(MessageType.FOLLOW.getValue());
-        message.setContentId(follow.getId());
-        message.setTime(follow1.getTime());
-        int messageNum = messageMapper.insertSelective(message);
-        if(follow1 == null || messageNum == 0){
-            return null;
+        if(followNum != 0){
+            return follow1;
         }
-        return follow1;
+        return null;
     }
 
     @Override

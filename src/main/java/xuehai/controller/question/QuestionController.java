@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 @RequestMapping("/question")
@@ -30,6 +32,22 @@ public class QuestionController {
     }
 
     @ResponseBody
+    @RequestMapping(value = "/deleteQuestion/{id}", method = RequestMethod.GET)
+    public String deleteQuestion(@PathVariable Long id, HttpSession session){
+        Integer authority = (Integer) session.getAttribute("authority");
+        Boolean login = (Boolean) session.getAttribute("login");
+        if(login == true && authority == 1){
+            Question question = questionService.deleteQuestion(id);
+            if(question != null){
+                return "1";
+            }
+            return "0";
+        }
+        return "0";
+    }
+
+
+    @ResponseBody
     @RequestMapping(value = "/collection/{questionId}", method = RequestMethod.POST)
     public String collect(@PathVariable Long questionId, HttpServletRequest httpServletRequest){
         if((Boolean) httpServletRequest.getSession().getAttribute("login")){
@@ -49,6 +67,35 @@ public class QuestionController {
         if((Boolean) httpServletRequest.getSession().getAttribute("login")){
             answer.setUser((Long)httpServletRequest.getSession().getAttribute("userId"));
             Answer answer1 = questionService.answerQuestion(answer);
+            if(answer1 != null){
+                return "1";
+            }
+            return "0";
+        }
+        return "0";
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/modifyAnswer", method = RequestMethod.POST)
+    public String modifyAnswer(@RequestBody Answer answer, HttpSession session){
+        if((Boolean) session.getAttribute("login")){
+            Long userId = (Long)session.getAttribute("userId");
+            answer.setUser(userId);
+            Answer answer1 = questionService.modifyAnswer(answer);
+            if(answer1 != null){
+                return "1";
+            }
+            return "0";
+        }
+        return "0";
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/deleteAnswer{id}", method = RequestMethod.GET)
+    public String deleteAnswer(@PathVariable Long id, HttpSession session){
+        if((Boolean) session.getAttribute("login")){
+            Long userId = (Long)session.getAttribute("userId");
+            Answer answer1 = questionService.deleteAnswer(userId, id);
             if(answer1 != null){
                 return "1";
             }
@@ -85,4 +132,14 @@ public class QuestionController {
         return "0";
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/deleteComment/{id}", method =  RequestMethod.GET)
+    public String deleteComment(@PathVariable Long id, HttpSession session){
+        if((Boolean) session.getAttribute("login")){
+            Long userId = (Long)session.getAttribute("userId");
+            Comment comment = questionService.deleteComment(userId, id);
+            return "0";
+        }
+        return "0";
+    }
 }

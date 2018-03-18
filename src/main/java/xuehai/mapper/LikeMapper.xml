@@ -79,4 +79,24 @@
       time = #{time,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <select id="selectSelective" parameterType="xuehai.model.Like" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from like
+    where 1=1
+    <trim prefix=" " suffix=" ">
+      <if test="id != null">
+        AND id = #{id,jdbcType=BIGINT},
+      </if>
+      <if test="user != null">
+        AND user = #{user,jdbcType=BIGINT},
+      </if>
+      <if test="answer != null">
+        AND answer = #{answer,jdbcType=BIGINT},
+      </if>
+      <if test="time != null">
+       AND time = #{time,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </select>
 </mapper>
