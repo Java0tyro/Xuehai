@@ -1,5 +1,7 @@
 package xuehai.util;
 
+import xuehai.model.User;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
