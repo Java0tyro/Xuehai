@@ -91,7 +91,7 @@ public class QuestionController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/deleteAnswer{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/deleteAnswer/{id}", method = RequestMethod.GET)
     public String deleteAnswer(@PathVariable Long id, HttpSession session){
         if((Boolean) session.getAttribute("login")){
             Long userId = (Long)session.getAttribute("userId");
@@ -105,7 +105,7 @@ public class QuestionController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/like/{answerId}")
+    @RequestMapping(value = "/likeAnswer/{answerId}", method = RequestMethod.GET)
     public String likeAnswer(@PathVariable Long answerId, HttpServletRequest httpServletRequest){
         if((Boolean) httpServletRequest.getSession().getAttribute("login")){
             Long userId = (Long)httpServletRequest.getSession().getAttribute("userId");

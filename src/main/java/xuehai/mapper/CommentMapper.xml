@@ -18,7 +18,7 @@
     content
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
-    select
+    select 
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
@@ -118,11 +118,12 @@
       time = #{time,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
   <select id="selectSelective" parameterType="xuehai.model.Comment" resultMap="ResultMapWithBLOBs">
     select
-    <include refid="Base_Column_List" />
+    <include refid="Base_Column_List"/>
     ,
-    <include refid="Blob_Column_List" />
+    <include refid="Blob_Column_List"/>
     from comment
     where 1=1
     <trim prefix=" " suffix=" ">
@@ -130,19 +131,19 @@
       AND id =  #{id,jdbcType=BIGINT}
       </if>
       <if test="user != null">
-        AND user =  #{user,jdbcType=BIGINT}
+      AND user =  #{user,jdbcType=BIGINT}
       </if>
       <if test="answer != null">
-        AND answer = #{answer,jdbcType=BIGINT}
+      AND answer =  #{answer,jdbcType=BIGINT}
       </if>
       <if test="parent != null">
-        AND parent = #{parent,jdbcType=BIGINT}
+      AND parent =  #{parent,jdbcType=BIGINT}
       </if>
       <if test="time != null">
-        AND time =  #{time,jdbcType=TIMESTAMP}
+      AND time =  #{time,jdbcType=TIMESTAMP}
       </if>
       <if test="content != null">
-        AND content =  #{content,jdbcType=LONGVARCHAR}
+      AND content =  #{content,jdbcType=LONGVARCHAR}
       </if>
     </trim>
   </select>

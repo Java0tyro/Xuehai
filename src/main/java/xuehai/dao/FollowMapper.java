@@ -14,9 +14,10 @@ public interface FollowMapper {
     int insertSelective(Follow record);
 
     Follow selectByPrimaryKey(Long id);
-    List<Follow> selectSelective(Follow follow);
 
     int updateByPrimaryKeySelective(Follow record);
 
     int updateByPrimaryKey(Follow record);
+
+    List<Follow> selectSelective(Follow follow);
 }

@@ -1,7 +1,5 @@
 package xuehai.vo;
 
-import xuehai.model.User;
-
 public class RegistVo {
     private User user;
 

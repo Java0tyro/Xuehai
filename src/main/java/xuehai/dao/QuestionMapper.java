@@ -14,11 +14,12 @@ public interface QuestionMapper {
     int insertSelective(Question record);
 
     Question selectByPrimaryKey(Long id);
-    List<Question> selectSelective(Question question);
 
     int updateByPrimaryKeySelective(Question record);
 
     int updateByPrimaryKeyWithBLOBs(Question record);
 
     int updateByPrimaryKey(Question record);
+
+    List<Question> selectSelective(Question question);
 }

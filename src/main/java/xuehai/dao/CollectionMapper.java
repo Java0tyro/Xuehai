@@ -14,9 +14,10 @@ public interface CollectionMapper {
     int insertSelective(Collection record);
 
     Collection selectByPrimaryKey(Long id);
-    List<Collection> selectSelective(Collection collection);
 
     int updateByPrimaryKeySelective(Collection record);
 
     int updateByPrimaryKey(Collection record);
+
+    List<Collection> selectSelective(Collection collection);
 }

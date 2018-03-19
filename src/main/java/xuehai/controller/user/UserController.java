@@ -1,8 +1,6 @@
 package xuehai.controller.user;
 
 
-import xuehai.model.Follow;
-import xuehai.model.User;
 import xuehai.service.UserService;
 import xuehai.util.ByteToString;
 import org.springframework.beans.factory.annotation.Autowired;

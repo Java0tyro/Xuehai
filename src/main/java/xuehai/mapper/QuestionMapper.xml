@@ -6,15 +6,13 @@
     <result column="user" jdbcType="BIGINT" property="user" />
     <result column="title" jdbcType="VARCHAR" property="title" />
     <result column="type" jdbcType="BIGINT" property="type" />
-    <result column="answer_num" jdbcType="INTEGER" property="answerNum" />
-    <result column="collection_num" jdbcType="INTEGER" property="collectionNum" />
     <result column="time" jdbcType="TIMESTAMP" property="time" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="xuehai.model.Question">
     <result column="content" jdbcType="LONGVARCHAR" property="content" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, user, title, type, answer_num, collection_num, time
+    id, user, title, type, time
   </sql>
   <sql id="Blob_Column_List">
     content
@@ -33,11 +31,11 @@
   </delete>
   <insert id="insert" parameterType="xuehai.model.Question">
     insert into question (id, user, title, 
-      type, answer_num, collection_num, 
-      time, content)
+      type, time, content
+      )
     values (#{id,jdbcType=BIGINT}, #{user,jdbcType=BIGINT}, #{title,jdbcType=VARCHAR}, 
-      #{type,jdbcType=BIGINT}, #{answerNum,jdbcType=INTEGER}, #{collectionNum,jdbcType=INTEGER}, 
-      #{time,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR})
+      #{type,jdbcType=BIGINT}, #{time,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR}
+      )
   </insert>
   <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="xuehai.model.Question">
     insert into question
@@ -53,12 +51,6 @@
       </if>
       <if test="type != null">
         type,
-      </if>
-      <if test="answerNum != null">
-        answer_num,
-      </if>
-      <if test="collectionNum != null">
-        collection_num,
       </if>
       <if test="time != null">
         time,
@@ -80,12 +72,6 @@
       <if test="type != null">
         #{type,jdbcType=BIGINT},
       </if>
-      <if test="answerNum != null">
-        #{answerNum,jdbcType=INTEGER},
-      </if>
-      <if test="collectionNum != null">
-        #{collectionNum,jdbcType=INTEGER},
-      </if>
       <if test="time != null">
         #{time,jdbcType=TIMESTAMP},
       </if>
@@ -106,12 +92,6 @@
       <if test="type != null">
         type = #{type,jdbcType=BIGINT},
       </if>
-      <if test="answerNum != null">
-        answer_num = #{answerNum,jdbcType=INTEGER},
-      </if>
-      <if test="collectionNum != null">
-        collection_num = #{collectionNum,jdbcType=INTEGER},
-      </if>
       <if test="time != null">
         time = #{time,jdbcType=TIMESTAMP},
       </if>
@@ -126,8 +106,6 @@
     set user = #{user,jdbcType=BIGINT},
       title = #{title,jdbcType=VARCHAR},
       type = #{type,jdbcType=BIGINT},
-      answer_num = #{answerNum,jdbcType=INTEGER},
-      collection_num = #{collectionNum,jdbcType=INTEGER},
       time = #{time,jdbcType=TIMESTAMP},
       content = #{content,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=BIGINT}
@@ -137,43 +115,37 @@
     set user = #{user,jdbcType=BIGINT},
       title = #{title,jdbcType=VARCHAR},
       type = #{type,jdbcType=BIGINT},
-      answer_num = #{answerNum,jdbcType=INTEGER},
-      collection_num = #{collectionNum,jdbcType=INTEGER},
       time = #{time,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
   <select id="selectSelective" parameterType="xuehai.model.Question" resultMap="ResultMapWithBLOBs">
     select
-    <include refid="Base_Column_List" />
+    <include refid="Base_Column_List"/>
     ,
-    <include refid="Blob_Column_List" />
+    <include refid="Blob_Column_List"/>
     from question
     where 1=1
     <trim prefix=" " suffix=" ">
       <if test="id != null">
-       AND id = #{id,jdbcType=BIGINT}
+      AND id =  #{id,jdbcType=BIGINT}
       </if>
       <if test="user != null">
-      AND user =  #{user,jdbcType=BIGINT}
+      AND user = #{user,jdbcType=BIGINT}
       </if>
       <if test="title != null">
-      AND title =   #{title,jdbcType=VARCHAR}
+      AND title =  #{title,jdbcType=VARCHAR}
       </if>
       <if test="type != null">
-        AND type =  #{type,jdbcType=BIGINT}
-      </if>
-      <if test="answerNum != null">
-        AND answer_num =  #{answerNum,jdbcType=INTEGER}
-      </if>
-      <if test="collectionNum != null">
-        AND collection_num =  #{collectionNum,jdbcType=INTEGER}
+      AND type =   #{type,jdbcType=BIGINT}
       </if>
       <if test="time != null">
-        AND time =  #{time,jdbcType=TIMESTAMP}
+      AND time =  #{time,jdbcType=TIMESTAMP}
       </if>
       <if test="content != null">
-        AND content =  #{content,jdbcType=LONGVARCHAR}
+       AND content =  #{content,jdbcType=LONGVARCHAR}
       </if>
     </trim>
+
   </select>
 </mapper>

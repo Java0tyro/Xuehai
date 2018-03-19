@@ -79,23 +79,24 @@
       time = #{time,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
   <select id="selectSelective" parameterType="xuehai.model.Follow" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from like
+    SELECT
+    <include refid="Base_Column_List"/>
+    from follow
     where 1=1
     <trim prefix=" " suffix=" ">
       <if test="id != null">
-      AND id = #{id,jdbcType=BIGINT}
+      AND id =  #{id,jdbcType=BIGINT}
       </if>
       <if test="userFrom != null">
-      AND user_from = #{userFrom,jdbcType=BIGINT}
+      AND user_from =  #{userFrom,jdbcType=BIGINT}
       </if>
       <if test="userTo != null">
-        AND user_to =  #{userTo,jdbcType=BIGINT}
+       AND user_to = #{userTo,jdbcType=BIGINT}
       </if>
       <if test="time != null">
-        AND time = #{time,jdbcType=TIMESTAMP}
+       AND time =  #{time,jdbcType=TIMESTAMP}
       </if>
     </trim>
   </select>

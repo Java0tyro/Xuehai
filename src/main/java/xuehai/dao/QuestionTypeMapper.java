@@ -15,9 +15,9 @@ public interface QuestionTypeMapper {
 
     QuestionType selectByPrimaryKey(Long id);
 
-    List<QuestionType> selectSelective(QuestionType questionType);
-
     int updateByPrimaryKeySelective(QuestionType record);
 
     int updateByPrimaryKey(QuestionType record);
+
+    List<QuestionType> selectSelective(QuestionType questionType);
 }

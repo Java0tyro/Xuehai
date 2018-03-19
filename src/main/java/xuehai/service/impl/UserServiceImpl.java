@@ -8,7 +8,6 @@ import xuehai.service.UserService;
 import xuehai.util.ByteToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import xuehai.util.MessageType;
 
 import java.security.MessageDigest;
 import java.security.SecureRandom;

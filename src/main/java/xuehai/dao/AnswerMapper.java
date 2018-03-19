@@ -14,11 +14,12 @@ public interface AnswerMapper {
     int insertSelective(Answer record);
 
     Answer selectByPrimaryKey(Long id);
-    List<Answer> selectSelective(Answer answer);
 
     int updateByPrimaryKeySelective(Answer record);
 
     int updateByPrimaryKeyWithBLOBs(Answer record);
 
     int updateByPrimaryKey(Answer record);
+
+    List<Answer> selectSelective(Answer answer);
 }

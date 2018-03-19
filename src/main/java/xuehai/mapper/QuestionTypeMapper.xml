@@ -68,22 +68,22 @@
       parent = #{parent,jdbcType=BIGINT}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
   <select id="selectSelective" parameterType="xuehai.model.QuestionType" resultMap="BaseResultMap">
     select
-    <include refid="Base_Column_List" />
+    <include refid="Base_Column_List"/>
     from question_type
     where 1=1
     <trim prefix=" " suffix=" ">
       <if test="id != null">
-       AND id = #{id,jdbcType=BIGINT}
+      AND id = #{id,jdbcType=BIGINT}
       </if>
       <if test="name != null">
-        AND name =  #{name,jdbcType=VARCHAR}
+       AND name = #{name,jdbcType=VARCHAR}
       </if>
       <if test="parent != null">
-        AND parent =  #{parent,jdbcType=BIGINT}
+      AND parent = #{parent,jdbcType=BIGINT}
       </if>
     </trim>
   </select>
-
 </mapper>

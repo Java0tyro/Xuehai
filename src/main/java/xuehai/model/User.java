@@ -16,18 +16,6 @@ public class User implements Serializable {
 
     private Integer authority;
 
-    private Date time;
-
-    private Date modifiedTime;
-
-    private Integer follower;
-
-    private Integer following;
-
-    private Integer questionNum;
-
-    private Integer answerNum;
-
     private Byte sex;
 
     private String profile;
@@ -35,6 +23,10 @@ public class User implements Serializable {
     private String school;
 
     private String major;
+
+    private Date time;
+
+    private Date modifiedTime;
 
     private static final long serialVersionUID = 1L;
 
@@ -86,54 +78,6 @@ public class User implements Serializable {
         this.authority = authority;
     }
 
-    public Date getTime() {
-        return time;
-    }
-
-    public void setTime(Date time) {
-        this.time = time;
-    }
-
-    public Date getModifiedTime() {
-        return modifiedTime;
-    }
-
-    public void setModifiedTime(Date modifiedTime) {
-        this.modifiedTime = modifiedTime;
-    }
-
-    public Integer getFollower() {
-        return follower;
-    }
-
-    public void setFollower(Integer follower) {
-        this.follower = follower;
-    }
-
-    public Integer getFollowing() {
-        return following;
-    }
-
-    public void setFollowing(Integer following) {
-        this.following = following;
-    }
-
-    public Integer getQuestionNum() {
-        return questionNum;
-    }
-
-    public void setQuestionNum(Integer questionNum) {
-        this.questionNum = questionNum;
-    }
-
-    public Integer getAnswerNum() {
-        return answerNum;
-    }
-
-    public void setAnswerNum(Integer answerNum) {
-        this.answerNum = answerNum;
-    }
-
     public Byte getSex() {
         return sex;
     }
@@ -166,6 +110,22 @@ public class User implements Serializable {
         this.major = major == null ? null : major.trim();
     }
 
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    public Date getModifiedTime() {
+        return modifiedTime;
+    }
+
+    public void setModifiedTime(Date modifiedTime) {
+        this.modifiedTime = modifiedTime;
+    }
+
     @Override
     public boolean equals(Object that) {
         if (this == that) {
@@ -184,16 +144,12 @@ public class User implements Serializable {
             && (this.getSalt() == null ? other.getSalt() == null : this.getSalt().equals(other.getSalt()))
             && (this.getEmail() == null ? other.getEmail() == null : this.getEmail().equals(other.getEmail()))
             && (this.getAuthority() == null ? other.getAuthority() == null : this.getAuthority().equals(other.getAuthority()))
-            && (this.getTime() == null ? other.getTime() == null : this.getTime().equals(other.getTime()))
-            && (this.getModifiedTime() == null ? other.getModifiedTime() == null : this.getModifiedTime().equals(other.getModifiedTime()))
-            && (this.getFollower() == null ? other.getFollower() == null : this.getFollower().equals(other.getFollower()))
-            && (this.getFollowing() == null ? other.getFollowing() == null : this.getFollowing().equals(other.getFollowing()))
-            && (this.getQuestionNum() == null ? other.getQuestionNum() == null : this.getQuestionNum().equals(other.getQuestionNum()))
-            && (this.getAnswerNum() == null ? other.getAnswerNum() == null : this.getAnswerNum().equals(other.getAnswerNum()))
             && (this.getSex() == null ? other.getSex() == null : this.getSex().equals(other.getSex()))
             && (this.getProfile() == null ? other.getProfile() == null : this.getProfile().equals(other.getProfile()))
             && (this.getSchool() == null ? other.getSchool() == null : this.getSchool().equals(other.getSchool()))
-            && (this.getMajor() == null ? other.getMajor() == null : this.getMajor().equals(other.getMajor()));
+            && (this.getMajor() == null ? other.getMajor() == null : this.getMajor().equals(other.getMajor()))
+            && (this.getTime() == null ? other.getTime() == null : this.getTime().equals(other.getTime()))
+            && (this.getModifiedTime() == null ? other.getModifiedTime() == null : this.getModifiedTime().equals(other.getModifiedTime()));
     }
 
     @Override
@@ -206,16 +162,12 @@ public class User implements Serializable {
         result = prime * result + ((getSalt() == null) ? 0 : getSalt().hashCode());
         result = prime * result + ((getEmail() == null) ? 0 : getEmail().hashCode());
         result = prime * result + ((getAuthority() == null) ? 0 : getAuthority().hashCode());
-        result = prime * result + ((getTime() == null) ? 0 : getTime().hashCode());
-        result = prime * result + ((getModifiedTime() == null) ? 0 : getModifiedTime().hashCode());
-        result = prime * result + ((getFollower() == null) ? 0 : getFollower().hashCode());
-        result = prime * result + ((getFollowing() == null) ? 0 : getFollowing().hashCode());
-        result = prime * result + ((getQuestionNum() == null) ? 0 : getQuestionNum().hashCode());
-        result = prime * result + ((getAnswerNum() == null) ? 0 : getAnswerNum().hashCode());
         result = prime * result + ((getSex() == null) ? 0 : getSex().hashCode());
         result = prime * result + ((getProfile() == null) ? 0 : getProfile().hashCode());
         result = prime * result + ((getSchool() == null) ? 0 : getSchool().hashCode());
         result = prime * result + ((getMajor() == null) ? 0 : getMajor().hashCode());
+        result = prime * result + ((getTime() == null) ? 0 : getTime().hashCode());
+        result = prime * result + ((getModifiedTime() == null) ? 0 : getModifiedTime().hashCode());
         return result;
     }
 
@@ -231,16 +183,12 @@ public class User implements Serializable {
         sb.append(", salt=").append(salt);
         sb.append(", email=").append(email);
         sb.append(", authority=").append(authority);
-        sb.append(", time=").append(time);
-        sb.append(", modifiedTime=").append(modifiedTime);
-        sb.append(", follower=").append(follower);
-        sb.append(", following=").append(following);
-        sb.append(", questionNum=").append(questionNum);
-        sb.append(", answerNum=").append(answerNum);
         sb.append(", sex=").append(sex);
         sb.append(", profile=").append(profile);
         sb.append(", school=").append(school);
         sb.append(", major=").append(major);
+        sb.append(", time=").append(time);
+        sb.append(", modifiedTime=").append(modifiedTime);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();

@@ -14,9 +14,10 @@ public interface LikeMapper {
     int insertSelective(Like record);
 
     Like selectByPrimaryKey(Long id);
-    List<Like> selectSelective(Like like);
 
     int updateByPrimaryKeySelective(Like record);
 
     int updateByPrimaryKey(Like record);
+
+    List<Like> selectSelective(Like like);
 }

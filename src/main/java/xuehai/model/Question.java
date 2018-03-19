@@ -12,10 +12,6 @@ public class Question implements Serializable {
 
     private Long type;
 
-    private Integer answerNum;
-
-    private Integer collectionNum;
-
     private Date time;
 
     private String content;
@@ -54,22 +50,6 @@ public class Question implements Serializable {
         this.type = type;
     }
 
-    public Integer getAnswerNum() {
-        return answerNum;
-    }
-
-    public void setAnswerNum(Integer answerNum) {
-        this.answerNum = answerNum;
-    }
-
-    public Integer getCollectionNum() {
-        return collectionNum;
-    }
-
-    public void setCollectionNum(Integer collectionNum) {
-        this.collectionNum = collectionNum;
-    }
-
     public Date getTime() {
         return time;
     }
@@ -102,8 +82,6 @@ public class Question implements Serializable {
             && (this.getUser() == null ? other.getUser() == null : this.getUser().equals(other.getUser()))
             && (this.getTitle() == null ? other.getTitle() == null : this.getTitle().equals(other.getTitle()))
             && (this.getType() == null ? other.getType() == null : this.getType().equals(other.getType()))
-            && (this.getAnswerNum() == null ? other.getAnswerNum() == null : this.getAnswerNum().equals(other.getAnswerNum()))
-            && (this.getCollectionNum() == null ? other.getCollectionNum() == null : this.getCollectionNum().equals(other.getCollectionNum()))
             && (this.getTime() == null ? other.getTime() == null : this.getTime().equals(other.getTime()))
             && (this.getContent() == null ? other.getContent() == null : this.getContent().equals(other.getContent()));
     }
@@ -116,8 +94,6 @@ public class Question implements Serializable {
         result = prime * result + ((getUser() == null) ? 0 : getUser().hashCode());
         result = prime * result + ((getTitle() == null) ? 0 : getTitle().hashCode());
         result = prime * result + ((getType() == null) ? 0 : getType().hashCode());
-        result = prime * result + ((getAnswerNum() == null) ? 0 : getAnswerNum().hashCode());
-        result = prime * result + ((getCollectionNum() == null) ? 0 : getCollectionNum().hashCode());
         result = prime * result + ((getTime() == null) ? 0 : getTime().hashCode());
         result = prime * result + ((getContent() == null) ? 0 : getContent().hashCode());
         return result;
@@ -133,8 +109,6 @@ public class Question implements Serializable {
         sb.append(", user=").append(user);
         sb.append(", title=").append(title);
         sb.append(", type=").append(type);
-        sb.append(", answerNum=").append(answerNum);
-        sb.append(", collectionNum=").append(collectionNum);
         sb.append(", time=").append(time);
         sb.append(", content=").append(content);
         sb.append(", serialVersionUID=").append(serialVersionUID);

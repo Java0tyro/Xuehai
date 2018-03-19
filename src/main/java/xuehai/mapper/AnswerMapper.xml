@@ -4,8 +4,6 @@
   <resultMap id="BaseResultMap" type="xuehai.model.Answer">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="user" jdbcType="BIGINT" property="user" />
-    <result column="like_num" jdbcType="INTEGER" property="likeNum" />
-    <result column="comment_num" jdbcType="INTEGER" property="commentNum" />
     <result column="question" jdbcType="BIGINT" property="question" />
     <result column="time" jdbcType="TIMESTAMP" property="time" />
     <result column="modified_time" jdbcType="TIMESTAMP" property="modifiedTime" />
@@ -14,7 +12,7 @@
     <result column="content" jdbcType="LONGVARCHAR" property="content" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, user, like_num, comment_num, question, time, modified_time
+    id, user, question, time, modified_time
   </sql>
   <sql id="Blob_Column_List">
     content
@@ -32,12 +30,12 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="xuehai.model.Answer">
-    insert into answer (id, user, like_num, 
-      comment_num, question, time, 
-      modified_time, content)
-    values (#{id,jdbcType=BIGINT}, #{user,jdbcType=BIGINT}, #{likeNum,jdbcType=INTEGER}, 
-      #{commentNum,jdbcType=INTEGER}, #{question,jdbcType=BIGINT}, #{time,jdbcType=TIMESTAMP}, 
-      #{modifiedTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR})
+    insert into answer (id, user, question, 
+      time, modified_time, content
+      )
+    values (#{id,jdbcType=BIGINT}, #{user,jdbcType=BIGINT}, #{question,jdbcType=BIGINT}, 
+      #{time,jdbcType=TIMESTAMP}, #{modifiedTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR}
+      )
   </insert>
   <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="xuehai.model.Answer">
     insert into answer
@@ -47,12 +45,6 @@
       </if>
       <if test="user != null">
         user,
-      </if>
-      <if test="likeNum != null">
-        like_num,
-      </if>
-      <if test="commentNum != null">
-        comment_num,
       </if>
       <if test="question != null">
         question,
@@ -74,12 +66,6 @@
       <if test="user != null">
         #{user,jdbcType=BIGINT},
       </if>
-      <if test="likeNum != null">
-        #{likeNum,jdbcType=INTEGER},
-      </if>
-      <if test="commentNum != null">
-        #{commentNum,jdbcType=INTEGER},
-      </if>
       <if test="question != null">
         #{question,jdbcType=BIGINT},
       </if>
@@ -100,12 +86,6 @@
       <if test="user != null">
         user = #{user,jdbcType=BIGINT},
       </if>
-      <if test="likeNum != null">
-        like_num = #{likeNum,jdbcType=INTEGER},
-      </if>
-      <if test="commentNum != null">
-        comment_num = #{commentNum,jdbcType=INTEGER},
-      </if>
       <if test="question != null">
         question = #{question,jdbcType=BIGINT},
       </if>
@@ -124,8 +104,6 @@
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="xuehai.model.Answer">
     update answer
     set user = #{user,jdbcType=BIGINT},
-      like_num = #{likeNum,jdbcType=INTEGER},
-      comment_num = #{commentNum,jdbcType=INTEGER},
       question = #{question,jdbcType=BIGINT},
       time = #{time,jdbcType=TIMESTAMP},
       modified_time = #{modifiedTime,jdbcType=TIMESTAMP},
@@ -135,46 +113,35 @@
   <update id="updateByPrimaryKey" parameterType="xuehai.model.Answer">
     update answer
     set user = #{user,jdbcType=BIGINT},
-      like_num = #{likeNum,jdbcType=INTEGER},
-      comment_num = #{commentNum,jdbcType=INTEGER},
       question = #{question,jdbcType=BIGINT},
       time = #{time,jdbcType=TIMESTAMP},
       modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
   <select id="selectSelective" parameterType="xuehai.model.Answer" resultMap="ResultMapWithBLOBs">
-    select
-    <include refid="Base_Column_List"/>
-    ,
-    <include refid="Blob_Column_List" />
-    from answer
-    where 1=1
-    <trim prefix=" " suffix=" ">
+    SELECT <include refid="Base_Column_List"/> , <include refid="Blob_Column_List"/>
+    FROM answer
+    WHERE  1=1
+    <trim prefix="  " suffix=" ">
       <if test="id != null">
-      AND id =  #{id,jdbcType=BIGINT}
+       AND id = #{id,jdbcType=BIGINT}
       </if>
       <if test="user != null">
-        AND user = #{user,jdbcType=BIGINT}
-      </if>
-      <if test="likeNum != null">
-        AND like_num = #{likeNum,jdbcType=INTEGER}
-      </if>
-      <if test="commentNum != null">
-        AND comment_num =  #{commentNum,jdbcType=INTEGER}
+       AND user =  #{user,jdbcType=BIGINT}
       </if>
       <if test="question != null">
-        AND question =#{question,jdbcType=BIGINT}
+      AND question =  #{question,jdbcType=BIGINT}
       </if>
       <if test="time != null">
-        AND time = #{time,jdbcType=TIMESTAMP}
+       AND time = #{time,jdbcType=TIMESTAMP}
       </if>
       <if test="modifiedTime != null">
-        AND modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
+       AND modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
       </if>
       <if test="content != null">
-        AND content = #{content,jdbcType=LONGVARCHAR}
+       AND content = #{content,jdbcType=LONGVARCHAR}
       </if>
     </trim>
   </select>
-
 </mapper>

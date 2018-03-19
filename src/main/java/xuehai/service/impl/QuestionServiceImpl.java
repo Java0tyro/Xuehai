@@ -20,7 +20,6 @@ public class QuestionServiceImpl implements QuestionService {
     @Autowired
     private FollowMapper followMapper;
 
-
     @Autowired
     private CollectionMapper collectionMapper;
 
@@ -89,11 +88,11 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public Answer modifyAnswer(Answer answer) {
         Answer answer1 = answerMapper.selectByPrimaryKey(answer.getId());
-        if(answer1 != null && answer1.getUser() == answer.getUser()){
+        if(answer1.getUser() == answer.getUser()){
             answer.setModifiedTime(new Date());
-            int answerNum = answerMapper.updateByPrimaryKey(answer);
+            int answerNum = answerMapper.updateByPrimaryKeySelective(answer);
             if(answerNum != 0){
-                return answer;
+                return answer1;
             }
             return null;
         }
@@ -121,7 +120,6 @@ public class QuestionServiceImpl implements QuestionService {
         like.setUser(userId);
         int likeNum = likeMapper.insertSelective(like);
         Like like1 = likeMapper.selectByPrimaryKey(like.getId());
-
         if(likeNum != 0){
             return like1;
         }

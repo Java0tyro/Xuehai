@@ -5,6 +5,7 @@ import xuehai.model.User;
 
 import java.util.List;
 
+
 @Repository
 public interface UserMapper {
     int deleteByPrimaryKey(Long id);
@@ -15,9 +16,9 @@ public interface UserMapper {
 
     User selectByPrimaryKey(Long id);
 
-    List<User> selectSelective(User user);
-
     int updateByPrimaryKeySelective(User record);
 
     int updateByPrimaryKey(User record);
+
+    List<User> selectSelective(User user);
 }
