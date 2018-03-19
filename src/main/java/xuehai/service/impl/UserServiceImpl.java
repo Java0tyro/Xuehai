@@ -1,18 +1,19 @@
 package xuehai.service.impl;
 
-import xuehai.dao.FollowMapper;
-import xuehai.dao.UserMapper;
+import xuehai.dao.*;
 import xuehai.model.Follow;
 import xuehai.model.User;
 import xuehai.service.UserService;
 import xuehai.util.ByteToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import xuehai.vo.NumberControl;
+import xuehai.vo.TimeLine;
+import xuehai.vo.UserVo;
 
 import java.security.MessageDigest;
 import java.security.SecureRandom;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -21,6 +22,21 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private FollowMapper followMapper;
+
+    @Autowired
+    private AnswerMapper answerMapper;
+
+    @Autowired
+    private LikeMapper likeMapper;
+
+    @Autowired
+    private CollectionMapper collectionMapper;
+
+    @Autowired
+    private CommentMapper commentMapper;
+
+    @Autowired
+    private QuestionMapper questionMapper;
 
     @Override
     public User login(String email) {
@@ -109,12 +125,44 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int deleteUser(Long id) {
-        //删除用户表记录
-        int num = userMapper.deleteByPrimaryKey(id);
-        if(num != 0){
+        Map<String, Long> map = new HashMap<>();
+        map.put("id", id);
+        //调用存储过程
+        userMapper.deleteUserByUserId(map);
+        User user= userMapper.selectByPrimaryKey(id);
+        if(user == null){
             return 1;
         }
         return 0;
+    }
+
+    @Override
+    public UserVo getDetail(Long userId) {
+        UserVo userVo = new UserVo();
+        User user = userMapper.selectByPrimaryKey(userId);
+        //个人信息中包括salt和password信息
+        user.setSalt(null);
+        user.setPassword(null);
+
+        userVo.setUser(user);
+        userVo.setAnswerNum(answerMapper.getAnswerNum(userId));
+        userVo.setCollectionNum(collectionMapper.getCollectionNum(userId));
+        userVo.setFollowedNum(followMapper.getFollowedNum(userId));
+        userVo.setFollowingNum(followMapper.getFollowingNum(userId));
+        userVo.setLikedNum(likeMapper.getLikedNum(userId));
+        userVo.setQuestionNum(questionMapper.getQuestionNum(userId));
+
+        return userVo;
+    }
+
+    @Override
+    public List<TimeLine> getTimeLine(Long userId, NumberControl numberControl) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("indexNum", numberControl.getIndexNum());
+        map.put("number", numberControl.getNumber());
+        List<TimeLine> timeLineList = userMapper.getTimeLine(map);
+        return timeLineList;
     }
 
 }

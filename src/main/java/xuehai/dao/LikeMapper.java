@@ -20,4 +20,10 @@ public interface LikeMapper {
     int updateByPrimaryKey(Like record);
 
     List<Like> selectSelective(Like like);
+
+    int deleteByQuestionId(Long questionId);
+
+    int deleteByAnswerId(Long answerId);
+
+    int getLikedNum(Long userId);
 }

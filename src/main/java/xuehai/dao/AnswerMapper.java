@@ -22,4 +22,8 @@ public interface AnswerMapper {
     int updateByPrimaryKey(Answer record);
 
     List<Answer> selectSelective(Answer answer);
+
+    int deleteByQuestionId(Long questionId);
+
+    int getAnswerNum(Long userId);
 }

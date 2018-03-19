@@ -22,4 +22,6 @@ public interface QuestionMapper {
     int updateByPrimaryKey(Question record);
 
     List<Question> selectSelective(Question question);
+
+    int getQuestionNum(Long userId);
 }

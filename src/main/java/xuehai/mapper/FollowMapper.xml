@@ -100,4 +100,14 @@
       </if>
     </trim>
   </select>
+
+  <select id="getFollowedNum" parameterType="java.lang.Long" resultType="java.lang.Integer">
+    SELECT COUNT(*)
+    FROM follow WHERE user_to = #{userId}
+  </select>
+
+  <select id="getFollowingNum" parameterType="java.lang.Long" resultType="java.lang.Integer">
+    SELECT COUNT(*)
+    FROM follow WHERE user_from = #{userId}
+  </select>
 </mapper>

@@ -140,8 +140,17 @@
        AND modified_time = #{modifiedTime,jdbcType=TIMESTAMP}
       </if>
       <if test="content != null">
-       AND content = #{content,jdbcType=LONGVARCHAR}
+       AND content LIKE #{content,jdbcType=LONGVARCHAR}
       </if>
     </trim>
+  </select>
+  <delete id="deleteByQuestionId" parameterType="java.lang.Long">
+    DELETE
+    FROM answer WHERE question = #{questionId}
+  </delete>
+
+  <select id="getAnswerNum" parameterType="java.lang.Long" resultType="java.lang.Integer">
+    select count(*)
+    from answer where user = #{userId}
   </select>
 </mapper>

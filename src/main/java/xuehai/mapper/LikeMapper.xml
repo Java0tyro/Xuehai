@@ -101,5 +101,20 @@
     </trim>
   </select>
 
+  <delete id="deleteByQuestionId" parameterType="java.lang.Long">
+    DELETE
+    FROM "like"
+    WHERE answer in (SELECT id FROM answer WHERE question = #{questionId})
+  </delete>
 
+  <delete id="deleteByAnswerId" parameterType="java.lang.Long">
+    DELETE
+    FROM "like"
+    WHERE answer = #{answerId}
+  </delete>
+
+  <select id="getLikedNum" parameterType="java.lang.Long" resultType="java.lang.Integer">
+    SELECT COUNT(*)
+    FROM "like" WHERE "like".answer in (SELECT id FROM answer WHERE answer.user = #{usreId})
+  </select>
 </mapper>

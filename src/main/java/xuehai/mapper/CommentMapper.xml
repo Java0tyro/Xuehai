@@ -143,8 +143,23 @@
       AND time =  #{time,jdbcType=TIMESTAMP}
       </if>
       <if test="content != null">
-      AND content =  #{content,jdbcType=LONGVARCHAR}
+      AND content LIKE #{content,jdbcType=LONGVARCHAR}
       </if>
     </trim>
+  </select>
+
+  <delete id="deleteByQuestionId" parameterType="java.lang.Long">
+    DELETE
+    from comment
+    WHERE answer in (SELECT id FROM answer WHERE question = #{questionId})
+  </delete>
+
+  <delete id="deleteByAnswerId" parameterType="java.lang.Long">
+    DELETE
+    FROM comment
+    WHERE answer = #{answerId}
+  </delete>
+  <select id="getCommentNum" parameterType="java.lang.Long" resultType="java.lang.Integer">
+    SELECT COUNT(*) FROM comment WHERE answer = #{answerId}
   </select>
 </mapper>

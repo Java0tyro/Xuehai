@@ -6,9 +6,12 @@ import xuehai.model.*;
 import org.springframework.stereotype.Service;
 import xuehai.service.QuestionService;
 import xuehai.util.MessageType;
+import xuehai.vo.AnswerVo;
+import xuehai.vo.QuestionVo;
 
 import java.awt.*;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -32,6 +35,9 @@ public class QuestionServiceImpl implements QuestionService {
     @Autowired
     private CommentMapper commentMapper;
 
+    @Autowired
+    private QuestionTypeMapper questionTypeMapper;
+
     @Override
     public Question publish(Question question) {
         //添加问题记录
@@ -49,6 +55,15 @@ public class QuestionServiceImpl implements QuestionService {
     public Question deleteQuestion(Long questionId) {
         Question question = questionMapper.selectByPrimaryKey(questionId);
         if(question != null){
+            //先删除回答的回复
+            commentMapper.deleteByQuestionId(questionId);
+            //删除回答的点赞
+            likeMapper.deleteByQuestionId(questionId);
+            //删除问题的回答
+            answerMapper.deleteByQuestionId(questionId);
+            //删除问题的收藏
+            collectionMapper.deleteByQuestionId(questionId);
+            //删除问题
             int questionNum = questionMapper.deleteByPrimaryKey(questionId);
             if(questionNum != 0){
                 return question;
@@ -101,8 +116,14 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public Answer deleteAnswer(Long userId, Long answerId) {
+
         Answer answer = answerMapper.selectByPrimaryKey(answerId);
         if(answer != null && answer.getUser() == userId){
+            //删除回答的回复
+            commentMapper.deleteByAnswerId(answerId);
+            //删除的回答的点赞
+            likeMapper.deleteByAnswerId(answerId);
+            //删除回答
             int answerNum = answerMapper.deleteByPrimaryKey(answerId);
             if(answerNum != 0){
                 return answer;
@@ -140,6 +161,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public Comment deleteComment(Long userId, Long commentId) {
+        //删除评论
         Comment comment = commentMapper.selectByPrimaryKey(commentId);
         if(comment != null && comment.getUser() == userId){
             int commentNum = commentMapper.deleteByPrimaryKey(commentId);
@@ -151,4 +173,47 @@ public class QuestionServiceImpl implements QuestionService {
         return null;
     }
 
+
+    @Override
+    public List<AnswerVo> getAnswers(Answer answer) {
+        List<AnswerVo> answerVoList = new LinkedList<>();
+        AnswerVo answerVo = new AnswerVo();
+        answer.setContent("%" + answer.getContent() + "%");
+        List<Answer> answerList = answerMapper.selectSelective(answer);
+        for(Answer answer1 : answerList){
+           answerVo.setAnswer(answer1);
+           answerVo.setCommentNum(commentMapper.getCommentNum(answer1.getId()));
+           answerVo.setLikedNum(likeMapper.getLikedNum(answer1.getUser()));
+           answerVoList.add(answerVo);
+        }
+        return answerVoList;
+    }
+
+    @Override
+    public List<Comment> getComments(Comment comment) {
+        comment.setContent("%" + comment.getContent() + "%");
+        return commentMapper.selectSelective(comment);
+    }
+
+    @Override
+    public List<QuestionVo> getQuestions(Question question) {
+        List<QuestionVo> questionVoList = new LinkedList<>();
+        question.setTitle("%" + question.getTitle() + "%");
+        question.setContent("%" + question.getContent() + "%");
+        QuestionVo questionVo = new QuestionVo();
+        List<Question> questionList = questionMapper.selectSelective(question);
+        for(Question question1 : questionList){
+            questionVo.setQuestion(question1);
+            Long userId = question1.getUser();
+            questionVo.setAnswerNum(answerMapper.getAnswerNum(userId));
+            questionVo.setCollectionNum(collectionMapper.getCollectionNum(userId));
+            questionVoList.add(questionVo);
+        }
+        return questionVoList;
+    }
+
+    @Override
+    public List<QuestionType> getQuestionType(QuestionType questionType) {
+        return questionTypeMapper.selectSelective(questionType);
+    }
 }

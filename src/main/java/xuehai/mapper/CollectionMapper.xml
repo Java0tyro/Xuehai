@@ -100,4 +100,12 @@
       </if>
     </trim>
   </select>
+  <delete id="deleteByQuestionId" parameterType="java.lang.Long">
+    DELETE FROM collection WHERE question = #{questionId}
+  </delete>
+
+  <select id="getCollectionNum" parameterType="java.lang.Long" resultType="java.lang.Integer">
+    SELECT count(*)
+    FROM collection WHERE user = #{userId}
+  </select>
 </mapper>

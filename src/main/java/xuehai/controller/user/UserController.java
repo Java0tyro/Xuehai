@@ -1,7 +1,10 @@
 package xuehai.controller.user;
 
 
+import org.springframework.util.backoff.BackOff;
+import xuehai.model.Answer;
 import xuehai.model.Follow;
+import xuehai.model.Question;
 import xuehai.model.User;
 import xuehai.service.UserService;
 import xuehai.util.ByteToString;
@@ -9,12 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import xuehai.util.SessionUtil;
+import xuehai.vo.NumberControl;
 import xuehai.vo.RegistVo;
+import xuehai.vo.TimeLine;
+import xuehai.vo.UserVo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.security.MessageDigest;
+import java.util.List;
 
 
 @Controller
@@ -120,14 +127,44 @@ public class UserController {
         if((Boolean)session.getAttribute("login") && (Integer)session.getAttribute("authority") == 1){
             int judge = userService.deleteUser(id);
             if(judge != 0){
-                //System.out.println(1);
                 return "1";
             }
-            //System.out.println(0);
             return "0";
         }
         return "0";
     }
-}
 
+    @ResponseBody
+    @RequestMapping(value = "/getMyDetail", method = RequestMethod.GET)
+    public UserVo getMyDetail(HttpSession session){
+        if((Boolean)session.getAttribute("login")){
+            UserVo userVo = userService.getDetail((Long)session.getAttribute("userId"));
+            return userVo;
+        }
+        return null;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getUserDetail/{userId}", method = RequestMethod.GET)
+    public UserVo getUserDetail(@PathVariable Long userId, HttpSession session) {
+        if((Boolean) session.getAttribute("login")){
+            UserVo userVo = userService.getDetail(userId);
+            return userVo;
+        }
+        return null;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getTimeLine")
+    public List<TimeLine> getTimeLine(@RequestBody NumberControl numberControl, HttpSession session){
+        if((Boolean) session.getAttribute("login")){
+            List<TimeLine> timeLineList = userService.getTimeLine((Long )session.getAttribute("userId"), numberControl);
+            return timeLineList;
+        }
+        return null;
+    }
+
+
+
+}
 

@@ -245,12 +245,13 @@ END;
 $$
 DELIMITER ;
 
-DELIMITER $$
+
 DROP PROCEDURE IF EXISTS sp_DeleteUser ;
+DELIMITER $$
 CREATE PROCEDURE sp_DeleteUser (IN user_id BIGINT)
 BEGIN
 	UPDATE answer SET `user` = NULL WHERE `user` = user_id;
-	UPDATE collection SET `user` = NULL WHERE `user` = user_id;
+	DELETE FROM collection WHERE `user` = user_id;
 	UPDATE `comment` SET `user` = NULL WHERE `user` = user_id;
 	DELETE FROM follow WHERE user_to = user_id OR user_from = user_id;
 	DELETE FROM `like` WHERE `user` = user_id;

@@ -22,4 +22,9 @@ public interface CommentMapper {
     int updateByPrimaryKey(Comment record);
 
     List<Comment> selectSelective(Comment comment);
+
+    int deleteByQuestionId(Long questionId);
+    int deleteByAnswerId(Long answerId);
+
+    int getCommentNum(Long answerId);
 }

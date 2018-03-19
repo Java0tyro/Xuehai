@@ -15,6 +15,17 @@
     <result column="time" jdbcType="TIMESTAMP" property="time" />
     <result column="modified_time" jdbcType="TIMESTAMP" property="modifiedTime" />
   </resultMap>
+
+  <resultMap id="TimeLine" type="xuehai.vo.TimeLine">
+    <result property="content1Id" column="content1_id" jdbcType="BIGINT"/>
+    <result property="content1" column="content1" jdbcType="VARCHAR"/>
+    <result property="content2Id" column="content2_id" jdbcType="BIGINT"/>
+    <result property="content2" column="content2" jdbcType="VARCHAR"/>
+    <result property="content3Id" column="content3_id" jdbcType="BIGINT"/>
+    <result property="content3" column="content3" jdbcType="VARCHAR"/>
+    <result property="contentType" column="content_type" jdbcType="INTEGER"/>
+    <result property="time" column="time" jdbcType="TIMESTAMP"/>
+  </resultMap>
   <sql id="Base_Column_List">
     id, username, password, salt, email, authority, sex, profile, school, major, time, 
     modified_time
@@ -218,5 +229,21 @@
       </if>
     </trim>
   </select>
+  <delete id="deleteUserByUserId" parameterType="java.util.Map" statementType="CALLABLE">
+    {
+        call sp_DeleteUser(
+          #{id,mode=IN,jdbcType=BIGINT}
+        )
+    }
+  </delete>
 
+  <select id="getTimeLine" parameterType="java.util.Map" statementType="CALLABLE" resultMap="TimeLine">
+    {
+      call sp_GetTimeline(
+        #{user_id, mode=IN, jdbcType=BIGINT},
+        #{index_num, mode=IN, jdbcType=INTEGER},
+        #{number, mode=IN, jdbcType=INTEGER}
+      )
+    }
+  </select>
 </mapper>

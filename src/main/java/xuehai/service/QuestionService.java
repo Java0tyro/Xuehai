@@ -2,6 +2,10 @@ package xuehai.service;
 
 import org.springframework.stereotype.Service;
 import xuehai.model.*;
+import xuehai.vo.AnswerVo;
+import xuehai.vo.QuestionVo;
+
+import java.util.List;
 
 
 @Service
@@ -17,5 +21,11 @@ public interface QuestionService {
 
     Comment commentAnswer(Comment comment);
     Comment deleteComment(Long userId, Long commentId);
+
+    List<AnswerVo> getAnswers(Answer answer);
+    List<QuestionVo> getQuestions(Question question);
+    List<Comment> getComments(Comment comment);
+
+    List<QuestionType> getQuestionType(QuestionType questionType);
 
 }

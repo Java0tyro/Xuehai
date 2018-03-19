@@ -20,4 +20,8 @@ public interface CollectionMapper {
     int updateByPrimaryKey(Collection record);
 
     List<Collection> selectSelective(Collection collection);
+
+    int deleteByQuestionId(Long questionId);
+
+    int getCollectionNum(Long userId);
 }

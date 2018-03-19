@@ -2,6 +2,8 @@ package xuehai.service;
 
 import xuehai.model.Follow;
 import xuehai.model.User;
+import xuehai.vo.NumberControl;
+import xuehai.vo.TimeLine;
 import xuehai.vo.UserVo;
 
 import java.util.List;
@@ -17,5 +19,7 @@ public interface UserService {
 
     int deleteUser(Long id);
 
-//    UserVo getMyDetail(Long userId);
+    UserVo getDetail(Long userId);
+
+    List<TimeLine> getTimeLine(Long userId, NumberControl numberControl);
 }

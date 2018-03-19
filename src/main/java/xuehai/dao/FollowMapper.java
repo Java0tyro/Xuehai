@@ -20,4 +20,7 @@ public interface FollowMapper {
     int updateByPrimaryKey(Follow record);
 
     List<Follow> selectSelective(Follow follow);
+
+    int getFollowedNum(Long userId);
+    int getFollowingNum(Long userId);
 }

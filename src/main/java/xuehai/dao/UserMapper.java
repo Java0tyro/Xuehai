@@ -2,8 +2,10 @@ package xuehai.dao;
 
 import org.springframework.stereotype.Repository;
 import xuehai.model.User;
+import xuehai.vo.TimeLine;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Repository
@@ -21,4 +23,8 @@ public interface UserMapper {
     int updateByPrimaryKey(User record);
 
     List<User> selectSelective(User user);
+
+    void deleteUserByUserId(Map<String, Long> map);
+
+    List<TimeLine> getTimeLine(Map<String, Object> map);
 }

@@ -134,7 +134,7 @@
       AND user = #{user,jdbcType=BIGINT}
       </if>
       <if test="title != null">
-      AND title =  #{title,jdbcType=VARCHAR}
+      AND title LIKE  #{title,jdbcType=VARCHAR}
       </if>
       <if test="type != null">
       AND type =   #{type,jdbcType=BIGINT}
@@ -143,9 +143,13 @@
       AND time =  #{time,jdbcType=TIMESTAMP}
       </if>
       <if test="content != null">
-       AND content =  #{content,jdbcType=LONGVARCHAR}
+       AND content LIKE  #{content,jdbcType=LONGVARCHAR}
       </if>
     </trim>
 
+  </select>
+
+  <select id="getQuestionNum" parameterType="java.lang.Long" resultType="java.lang.Integer">
+    SELECT COUNT(*) FROM question WHERE question.user = #{userId}
   </select>
 </mapper>
