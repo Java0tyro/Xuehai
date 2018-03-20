@@ -71,7 +71,7 @@ public class UserController {
         return "1";
     }
 
-    @RequestMapping(name = "/login", method = RequestMethod.GET)
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String getLogin(){
         return "login";
     }
