@@ -64,6 +64,13 @@ public class UserController {
 
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/logout", method = RequestMethod.GET)
+    public String logout(HttpSession session){
+        session.setAttribute("login", false);
+        return "1";
+    }
+
     @RequestMapping(name = "/login", method = RequestMethod.GET)
     public String getLogin(){
         return "login";
@@ -103,7 +110,7 @@ public class UserController {
             SessionUtil.addInformation(httpServletRequest, user);
             return "1";
         }
-        return "0";
+        return "";
     }
 
     @ResponseBody
@@ -116,7 +123,35 @@ public class UserController {
             }
             return "1";
         }
-        return "0";
+        return "";
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/cancelFollow/{userId}", method = RequestMethod.GET)
+    public String cancelFollow(@PathVariable Long userId, HttpSession session){
+        if((Boolean)session.getAttribute("login")){
+            Follow follow = userService.cancelFollow((Long)session.getAttribute("userId"), userId);
+            if(follow != null){
+                return  "1";
+            }
+            return "0";
+        }
+        return "";
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getFollowList", method = RequestMethod.GET, produces = "application/json")
+    public List<Follow> getFollowedList(@RequestParam(value = "from", required = false)Long userFrom,
+            @RequestParam(value = "to", required = false)Long userTo,
+            HttpSession session){
+        if((Boolean)session.getAttribute("login")){
+            Follow follow = new Follow();
+            follow.setUserFrom(userFrom);
+            follow.setUserTo(userTo);
+            List<Follow> followList = userService.getFollowList(follow);
+            return followList;
+        }
+        return null;
     }
 
 
@@ -131,11 +166,11 @@ public class UserController {
             }
             return "0";
         }
-        return "0";
+        return "";
     }
 
     @ResponseBody
-    @RequestMapping(value = "/getMyDetail", method = RequestMethod.GET)
+    @RequestMapping(value = "/getMyDetail", method = RequestMethod.GET, produces = "application/json")
     public UserVo getMyDetail(HttpSession session){
         if((Boolean)session.getAttribute("login")){
             UserVo userVo = userService.getDetail((Long)session.getAttribute("userId"));
@@ -145,7 +180,7 @@ public class UserController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/getUserDetail/{userId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getUserDetail/{userId}", method = RequestMethod.GET, produces = "application/json")
     public UserVo getUserDetail(@PathVariable Long userId, HttpSession session) {
         if((Boolean) session.getAttribute("login")){
             UserVo userVo = userService.getDetail(userId);
@@ -155,15 +190,21 @@ public class UserController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/getTimeLine")
-    public List<TimeLine> getTimeLine(@RequestBody NumberControl numberControl, HttpSession session){
+    @RequestMapping(value = "/getTimeLine", method = RequestMethod.GET, produces = "application/json")
+    public List<TimeLine> getTimeLine(@RequestParam(value = "indexNum", required = false) int indexNum,
+                                      @RequestParam(value = "number", required = false) int number,
+                                      HttpSession session){
         if((Boolean) session.getAttribute("login")){
-            List<TimeLine> timeLineList = userService.getTimeLine((Long )session.getAttribute("userId"), numberControl);
+            Long userId = (Long )session.getAttribute("userId");
+            NumberControl numberControl = new NumberControl();
+            numberControl.setNumber(number);
+            numberControl.setIndexNum(indexNum);
+            numberControl.setUserId(userId);
+            List<TimeLine> timeLineList = userService.getTimeLine(numberControl);
             return timeLineList;
         }
         return null;
     }
-
 
 
 }

@@ -23,6 +23,8 @@ public interface QuestionService {
     Comment deleteComment(Long userId, Long commentId);
 
     List<AnswerVo> getAnswers(Answer answer);
+    List<Like> getLikeList(Like like);
+    List<Collection> getCollectionList(Collection collection);
     List<QuestionVo> getQuestions(Question question);
     List<Comment> getComments(Comment comment);
 

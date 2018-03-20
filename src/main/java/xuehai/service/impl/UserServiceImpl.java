@@ -1,5 +1,6 @@
 package xuehai.service.impl;
 
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import xuehai.dao.*;
 import xuehai.model.Follow;
 import xuehai.model.User;
@@ -37,6 +38,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private QuestionMapper questionMapper;
+
+
 
     @Override
     public User login(String email) {
@@ -124,6 +127,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Follow cancelFollow(Long userFrom, Long userTo) {
+        Follow follow = new Follow();
+        follow.setUserFrom(userFrom);
+        follow.setUserTo(userTo);
+        List<Follow> followList = followMapper.selectSelective(follow);
+        if(followList.size() == 0){
+            return null;
+        }
+        else{
+            Follow follow1 = followList.get(0);
+            followMapper.deleteByPrimaryKey(follow1.getId());
+            return follow1;
+        }
+    }
+
+    @Override
+    public List<Follow> getFollowList(Follow follow) {
+        List<Follow> followList = followMapper.selectSelective(follow);
+        return followList;
+    }
+
+    @Override
     public int deleteUser(Long id) {
         Map<String, Long> map = new HashMap<>();
         map.put("id", id);
@@ -156,12 +181,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<TimeLine> getTimeLine(Long userId, NumberControl numberControl) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("userId", userId);
-        map.put("indexNum", numberControl.getIndexNum());
-        map.put("number", numberControl.getNumber());
-        List<TimeLine> timeLineList = userMapper.getTimeLine(map);
+    public List<TimeLine> getTimeLine(NumberControl numberControl) {
+        List<TimeLine> timeLineList = userMapper.getTimeLine(numberControl);
+
         return timeLineList;
     }
 

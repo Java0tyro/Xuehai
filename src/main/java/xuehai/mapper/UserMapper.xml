@@ -26,6 +26,7 @@
     <result property="contentType" column="content_type" jdbcType="INTEGER"/>
     <result property="time" column="time" jdbcType="TIMESTAMP"/>
   </resultMap>
+
   <sql id="Base_Column_List">
     id, username, password, salt, email, authority, sex, profile, school, major, time, 
     modified_time
@@ -237,13 +238,15 @@
     }
   </delete>
 
-  <select id="getTimeLine" parameterType="java.util.Map" statementType="CALLABLE" resultMap="TimeLine">
+  <select id="getTimeLine" parameterType="xuehai.vo.NumberControl" statementType="CALLABLE" resultMap="TimeLine">
     {
       call sp_GetTimeline(
-        #{user_id, mode=IN, jdbcType=BIGINT},
-        #{index_num, mode=IN, jdbcType=INTEGER},
+        #{userId, mode=IN, jdbcType=BIGINT},
+        #{indexNum, mode=IN, jdbcType=INTEGER},
         #{number, mode=IN, jdbcType=INTEGER}
       )
+
     }
+
   </select>
 </mapper>

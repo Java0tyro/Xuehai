@@ -2,6 +2,7 @@ package xuehai.dao;
 
 import org.springframework.stereotype.Repository;
 import xuehai.model.User;
+import xuehai.vo.NumberControl;
 import xuehai.vo.TimeLine;
 
 import java.util.List;
@@ -26,5 +27,5 @@ public interface UserMapper {
 
     void deleteUserByUserId(Map<String, Long> map);
 
-    List<TimeLine> getTimeLine(Map<String, Object> map);
+    List<TimeLine> getTimeLine(NumberControl numberControl);
 }

@@ -17,9 +17,13 @@ public interface UserService {
 
     Follow follow(Long fromId, Long toId);
 
+    Follow cancelFollow(Long userFrom, Long userTo);
+
+    List<Follow> getFollowList(Follow follow);
+
     int deleteUser(Long id);
 
     UserVo getDetail(Long userId);
 
-    List<TimeLine> getTimeLine(Long userId, NumberControl numberControl);
+    List<TimeLine> getTimeLine(NumberControl numberControl);
 }

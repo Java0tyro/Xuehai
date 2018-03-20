@@ -149,7 +149,7 @@ public class QuestionController {
 
     //获取回答列表
     @ResponseBody
-    @RequestMapping(value = "/getAnswers", method = RequestMethod.GET)
+    @RequestMapping(value = "/getAnswers", method = RequestMethod.GET, produces = "application/json")
     public List<AnswerVo> getAnswers(@RequestParam(value = "id", required = false) Long id,
                                      @RequestParam(value = "content", required = false) String content,
                                      @RequestParam(value = "user", required = false) Long user,
@@ -169,7 +169,7 @@ public class QuestionController {
     }
     //获取问题列表
     @ResponseBody
-    @RequestMapping(value = "/getQuestions", method = RequestMethod.GET)
+    @RequestMapping(value = "/getQuestions", method = RequestMethod.GET, produces = "application/json")
     public List<QuestionVo> getQuestions(@RequestParam(value = "id", required = false)Long id,
                                          @RequestParam(value = "user", required = false)Long userId,
                                          @RequestParam(value = "title", required = false)String title,
@@ -178,6 +178,7 @@ public class QuestionController {
                                          HttpSession session ){
         if((Boolean)session.getAttribute("login")){
                 Question question = new Question();
+                System.out.println(id + " " + userId );
                 question.setUser(userId);
                 question.setId(id);
                 question.setTitle(title);
@@ -190,9 +191,32 @@ public class QuestionController {
     }
 
 
+    @ResponseBody
+    @RequestMapping(value = "/getCollectionList/{questionId}", method = RequestMethod.GET)
+    public List<Collection> getCollectionList(@PathVariable Long questionId,  HttpSession session){
+        if((Boolean)session.getAttribute("login")){
+            Collection collection = new Collection();
+            collection.setQuestion(questionId);
+            return questionService.getCollectionList(collection);
+        }
+        return null;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getLikeList/{answerId}", method = RequestMethod.GET)
+    public List<Like> getLikeList(@PathVariable Long answerId, HttpSession session){
+        if((Boolean)session.getAttribute("login")){
+            Like like = new Like();
+            like.setAnswer(answerId);
+            return questionService.getLikeList(like);
+        }
+        return null;
+    }
+
+
     //获取评论列表
     @ResponseBody
-    @RequestMapping(value = "/getComment", method = RequestMethod.GET)
+    @RequestMapping(value = "/getComment", method = RequestMethod.GET, produces = "application/json")
     public List<Comment> getComments(@RequestParam(value = "id", required = false)Long id,
                                      @RequestParam(value = "user", required = false)Long userId,
                                      @RequestParam(value = "content", required = false)String content,
@@ -206,9 +230,6 @@ public class QuestionController {
             comment.setContent(content);
             comment.setId(id);
             List<Comment> commentList = questionService.getComments(comment);
-            if(commentList == null){
-                commentList = new LinkedList<>();
-            }
             return commentList;
         }
         return null;
@@ -216,7 +237,7 @@ public class QuestionController {
 
 
     @ResponseBody
-    @RequestMapping(value = "/getQuestionType", method = RequestMethod.GET)
+    @RequestMapping(value = "/getQuestionType", method = RequestMethod.GET, produces = "application/json")
     public List<QuestionType> getQuestionType(@RequestParam(value = "id", required = false) Long id,
                                               @RequestParam(value = "name", required = false)String name,
                                               @RequestParam(value = "parent", required = false)Long parent,
@@ -227,12 +248,12 @@ public class QuestionController {
             questionType.setName(name);
             questionType.setParent(parent);
             List<QuestionType> questionTypes = questionService.getQuestionType(questionType);
-            if(questionTypes == null){
-                questionTypes = new LinkedList<>();
-            }
             return questionTypes;
         }
         return null;
     }
+
+
+
 
 }

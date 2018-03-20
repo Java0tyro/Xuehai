@@ -178,7 +178,8 @@ public class QuestionServiceImpl implements QuestionService {
     public List<AnswerVo> getAnswers(Answer answer) {
         List<AnswerVo> answerVoList = new LinkedList<>();
         AnswerVo answerVo = new AnswerVo();
-        answer.setContent("%" + answer.getContent() + "%");
+        answer.setContent(answer.getContent() != null ?
+                "%" + answer.getContent() + "%" : null);
         List<Answer> answerList = answerMapper.selectSelective(answer);
         for(Answer answer1 : answerList){
            answerVo.setAnswer(answer1);
@@ -189,17 +190,32 @@ public class QuestionServiceImpl implements QuestionService {
         return answerVoList;
     }
 
+
+    @Override
+    public List<Collection> getCollectionList(Collection collection) {
+        return collectionMapper.selectSelective(collection);
+    }
+
+    @Override
+    public List<Like> getLikeList(Like like) {
+        return likeMapper.selectSelective(like);
+    }
+
     @Override
     public List<Comment> getComments(Comment comment) {
-        comment.setContent("%" + comment.getContent() + "%");
+        comment.setContent(comment.getContent() != null ?
+                "%" + comment.getContent() + "%" : null);
         return commentMapper.selectSelective(comment);
     }
 
     @Override
     public List<QuestionVo> getQuestions(Question question) {
         List<QuestionVo> questionVoList = new LinkedList<>();
-        question.setTitle("%" + question.getTitle() + "%");
-        question.setContent("%" + question.getContent() + "%");
+        question.setTitle(question.getTitle() != null ?
+                ("%" + question.getTitle() + "%") : null);
+        question.setContent(question.getContent() != null ?
+                "%" + question.getContent() + "%" : null);
+
         QuestionVo questionVo = new QuestionVo();
         List<Question> questionList = questionMapper.selectSelective(question);
         for(Question question1 : questionList){
