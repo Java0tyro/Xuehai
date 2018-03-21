@@ -8,12 +8,20 @@ import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.URL;
 import java.util.Properties;
 
 public class MailUtil {
     public static void sendMail(String toEmail, String subject,
                                 String htmlContent) {
 
+        try {
+            MailConfigure.set();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         JavaMailSenderImpl senderImpl = new JavaMailSenderImpl();
 
         // 发送邮箱的邮件服务器
@@ -66,15 +74,30 @@ public class MailUtil {
         senderImpl.send(mailMessage);
     }
 
+    public static void test() throws Exception{
+        MailConfigure.set();
+    }
+
 }
 
 
 class MailConfigure {
     //发邮件
-    public final static String EMAIL_FORM = "494391537@qq.com";
-    public final static String EMAIL_HOST = "smtp.qq.com";
-    public final static String EMAIL_USERNAME = "494391537@qq.com";
-    public final static String EMAIL_PWD = "hdqjhlspspkycbbf";
+    public static String EMAIL_FORM = null;
+    public static String EMAIL_HOST = null;
+    public static String EMAIL_USERNAME = null;
+    public static String EMAIL_PWD = null;
+
+    public static void set() throws Exception{
+        Properties properties = new Properties();
+
+        properties.load(MailUtil.class.getClassLoader().getResourceAsStream("mailConfigure.properties"));
+        EMAIL_FORM = properties.getProperty("email_from");
+        EMAIL_HOST = properties.getProperty("email_host");
+        EMAIL_USERNAME = properties.getProperty("email_username");
+        EMAIL_PWD = properties.getProperty("email_pwd");
+        //System.out.println(properties);
+    }
 }
 
 

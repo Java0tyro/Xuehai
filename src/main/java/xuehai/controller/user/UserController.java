@@ -121,7 +121,7 @@ public class UserController {
                 Algorithm algorithm = Algorithm.HMAC512(secret);
         String token = JWT.create()
                 .withIssuer("xue_hai")
-                .withSubject("1710519209")
+                .withSubject(email)
                 .withAudience("kkkk")
                 .withExpiresAt(end)
                 .withIssuedAt(start)
@@ -183,8 +183,11 @@ public class UserController {
                     .build();
             DecodedJWT jwt = verifier.verify(token);
             String email = jwt.getSubject();
+            String password = user.getPassword();
+            user.setPassword(null);
             user.setEmail(email);
             user = userService.getUsers(user).get(0);
+            System.out.println(user);
 
             //验证时间
             if(new Date().getTime() > jwt.getExpiresAt().getTime()){
@@ -193,12 +196,12 @@ public class UserController {
             }
             User user1 = new User();
             user1.setId(user.getId());
-            user1.setPassword(user.getPassword());
+            user1.setPassword(password);
             userService.modify(user1);
             return "1";
         }
         catch (Exception e){
-
+            e.printStackTrace();
         }
         return "";
     }
