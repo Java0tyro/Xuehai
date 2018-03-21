@@ -13,6 +13,12 @@ public interface UserService {
 
     User regist(User user);
 
+    void sendEmail(String email, String address);
+
+    List<User> getUsers(User user);
+
+    int isDuplicated(String email);
+
     User modify(User user);
 
     Follow follow(Long fromId, Long toId);

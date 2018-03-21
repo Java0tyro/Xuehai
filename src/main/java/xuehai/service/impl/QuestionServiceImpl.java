@@ -217,6 +217,7 @@ public class QuestionServiceImpl implements QuestionService {
                 "%" + question.getContent() + "%" : null);
 
         QuestionVo questionVo = new QuestionVo();
+
         List<Question> questionList = questionMapper.selectSelective(question);
         for(Question question1 : questionList){
             questionVo.setQuestion(question1);

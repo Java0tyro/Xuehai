@@ -103,6 +103,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> getUsers(User user) {
+        List<User> userList = userMapper.selectSelective(user);
+        return  userList;
+    }
+
+    @Override
     public User modify(User user) {
         if(user.getPassword() != null){
             String salt = null;

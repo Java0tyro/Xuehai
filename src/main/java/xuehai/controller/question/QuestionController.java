@@ -192,11 +192,14 @@ public class QuestionController {
 
 
     @ResponseBody
-    @RequestMapping(value = "/getCollectionList/{questionId}", method = RequestMethod.GET)
-    public List<Collection> getCollectionList(@PathVariable Long questionId,  HttpSession session){
+    @RequestMapping(value = "/getCollectionList", method = RequestMethod.GET)
+    public List<Collection> getCollectionList(@RequestParam(value = "questionId", required = false) Long questionId,
+                                                @RequestParam(value = "userId", required = false)Long userId,
+                                              HttpSession session){
         if((Boolean)session.getAttribute("login")){
             Collection collection = new Collection();
             collection.setQuestion(questionId);
+            collection.setUser(userId);
             return questionService.getCollectionList(collection);
         }
         return null;
