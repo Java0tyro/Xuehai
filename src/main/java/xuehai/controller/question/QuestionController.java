@@ -192,7 +192,7 @@ public class QuestionController {
 
 
     @ResponseBody
-    @RequestMapping(value = "/getCollectionList", method = RequestMethod.GET)
+    @RequestMapping(value = "/getCollectionList", method = RequestMethod.GET, produces = "application/json")
     public List<Collection> getCollectionList(@RequestParam(value = "questionId", required = false) Long questionId,
                                                 @RequestParam(value = "userId", required = false)Long userId,
                                               HttpSession session){
@@ -206,7 +206,7 @@ public class QuestionController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/getLikeList/{answerId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getLikeList/{answerId}", method = RequestMethod.GET, produces = "application/json")
     public List<Like> getLikeList(@PathVariable Long answerId, HttpSession session){
         if((Boolean)session.getAttribute("login")){
             Like like = new Like();

@@ -39,7 +39,7 @@ public class UserController {
     String secret = "shdjshfjkdhkfhdsjkfsdsds0";
 
     @ResponseBody
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    @RequestMapping(value = "/login", method = RequestMethod.POST, produces = "application/json")
     public UserVo login(@RequestBody RegistVo registVo,
                         HttpServletRequest httpServletRequest,
                         HttpServletResponse httpServletResponse){
@@ -85,7 +85,7 @@ public class UserController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/regist", method = RequestMethod.POST)
+    @RequestMapping(value = "/regist", method = RequestMethod.POST, produces = "application/json")
     public User regist(@RequestBody RegistVo registVo,
                        HttpServletRequest httpServletRequest,
                        HttpServletResponse httpServletResponse){
@@ -204,7 +204,7 @@ public class UserController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/getUsers", method =  RequestMethod.GET)
+    @RequestMapping(value = "/getUsers", method =  RequestMethod.GET, produces = "application/json")
     public List<User> getUsers(@RequestParam(value = "id", required = false)Long userId,
                                @RequestParam(value = "username", required = false)String username,
                                @RequestParam(value = "email", required = false)String email
