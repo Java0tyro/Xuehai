@@ -15,7 +15,7 @@
     <mvc:annotation-driven />
 
     <!-- 静态资源处理 -->
-    <mvc:default-servlet-handler />
+    <mvc:resources location="/static/images/" mapping="/static/images/**" />
 
     <!--
     <mvc:interceptors>
@@ -40,8 +40,8 @@
 
     <!-- 上传 -->
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-        <property name="resolveLazily" value="true" />
-        <property name="maxUploadSize" value="20971520" />
+        <property name="maxInMemorySize" value="10240" />
+        <property name="maxUploadSize" value="-1" />
         <property name="defaultEncoding" value="utf-8" />
     </bean>
 

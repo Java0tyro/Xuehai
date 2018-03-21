@@ -1,5 +1,6 @@
 package xuehai.dao;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import xuehai.model.Question;
 

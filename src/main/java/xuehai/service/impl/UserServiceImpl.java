@@ -8,6 +8,7 @@ import xuehai.service.UserService;
 import xuehai.util.ByteToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import xuehai.util.MailUtil;
 import xuehai.vo.NumberControl;
 import xuehai.vo.TimeLine;
 import xuehai.vo.UserVo;
@@ -79,6 +80,32 @@ public class UserServiceImpl implements UserService {
             return user;
         }
         return null;
+    }
+
+
+    @Override
+    public void sendEmail(String email, String address) {
+        String toEmail = email;
+        String subject = "重置密码";
+        String htmlContent = "<html><body><a href=\"" + address + "\">重置密码</a></body></html>" + "如果上述链接不能点击请复制以下链接：" + address;
+        MailUtil.sendMail(toEmail, subject, htmlContent);
+    }
+
+    @Override
+    public int isDuplicated(String email) {
+        User user = new User();
+        user.setEmail(email);
+        List<User> userList = userMapper.selectSelective(user);
+        if(userList.isEmpty()){
+            return 0;
+        }
+        return 1;
+    }
+
+    @Override
+    public List<User> getUsers(User user) {
+        List<User> userList = userMapper.selectSelective(user);
+        return  userList;
     }
 
     @Override

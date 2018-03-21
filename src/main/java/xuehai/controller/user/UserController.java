@@ -1,10 +1,13 @@
 package xuehai.controller.user;
 
 
-import org.springframework.util.backoff.BackOff;
-import xuehai.model.Answer;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import org.springframework.ui.Model;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import xuehai.model.Follow;
-import xuehai.model.Question;
 import xuehai.model.User;
 import xuehai.service.UserService;
 import xuehai.util.ByteToString;
@@ -20,8 +23,11 @@ import xuehai.vo.UserVo;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.File;
 import java.security.MessageDigest;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 
 @Controller
@@ -30,9 +36,11 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    String secret = "shdjshfjkdhkfhdsjkfsdsds0";
+
     @ResponseBody
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String login(@RequestBody RegistVo registVo,
+    @RequestMapping(value = "/login", method = RequestMethod.POST, produces = "application/json")
+    public UserVo login(@RequestBody RegistVo registVo,
                         HttpServletRequest httpServletRequest,
                         HttpServletResponse httpServletResponse){
         String email = registVo.getUser().getEmail();
@@ -58,7 +66,7 @@ public class UserController {
 
         if(strResult != null && strResult.equals(user.getPassword())){
             SessionUtil.addInformation(httpServletRequest, user);
-            return registVo.getRedirectUrl();
+            return userService.getDetail(user.getId());
         }
         return null;
 
@@ -77,17 +85,17 @@ public class UserController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/regist", method = RequestMethod.POST)
-    public String regist(@RequestBody RegistVo registVo,
+    @RequestMapping(value = "/regist", method = RequestMethod.POST, produces = "application/json")
+    public User regist(@RequestBody RegistVo registVo,
                        HttpServletRequest httpServletRequest,
                        HttpServletResponse httpServletResponse){
         User user = registVo.getUser();
         User user1 =  userService.regist(user);
         if(user1 != null){
             SessionUtil.addInformation(httpServletRequest, user1);
-            return registVo.getRedirectUrl();
+            return user1;
         }
-        return "/regist";
+        return null;
     }
 
     @RequestMapping(value = "/regist", method = RequestMethod.GET)
@@ -95,6 +103,129 @@ public class UserController {
         return "regist";
     }
 
+
+    @RequestMapping(value = "/getUpload", method = RequestMethod.GET)
+    public String get(){
+        return "show";
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/forget", method = RequestMethod.GET)
+    public String forgetPassword(@RequestParam(value = "email", required = true)String email) throws Exception{
+        if(userService.isDuplicated(email) != 1){
+            return "";
+        }
+        Date start = new Date();
+        Date end = new Date();
+        end.setTime( start.getTime() + 10 * 60 *1000 );//过期10分钟
+                Algorithm algorithm = Algorithm.HMAC512(secret);
+        String token = JWT.create()
+                .withIssuer("xue_hai")
+                .withSubject(email)
+                .withAudience("kkkk")
+                .withExpiresAt(end)
+                .withIssuedAt(start)
+                .sign(algorithm);
+        String address = "http://localhost:8080/Xuehai/user/reset?token=" + token;
+        System.out.println(address);
+        userService.sendEmail(email, address);
+        return "1";
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    public String upload(@RequestParam(value="file",required=false) CommonsMultipartFile file,
+                         HttpServletRequest request) throws Exception{
+
+            //获得物理路径webapp所在路径
+            String pathRoot = request.getSession().getServletContext().getRealPath("/");
+            System.out.println(pathRoot);
+            String path="";
+            if(file != null){
+                if(!file.isEmpty()){
+                    //生成uuid作为文件名称
+                    String uuid = UUID.randomUUID().toString().replaceAll("-","");
+                    //获得文件类型（可以判断如果不是图片，禁止上传）
+                    String contentType=file.getContentType();
+                    //获得文件后缀名称
+                    String imageName=contentType.substring(contentType.indexOf("/")+1);
+                    path="static/images/"+uuid+"."+imageName;
+                    File newFile = new File(pathRoot+path);
+                    if( !newFile.getParentFile().exists()) {
+                        // 如果目标文件所在的目录不存在，则创建父目录
+                        newFile.getParentFile().mkdirs();
+                    }
+                    file.transferTo(newFile);
+                    return path;
+                }
+            }
+
+            return "1";
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/reset", method = RequestMethod.GET)
+    public String reset(@RequestParam(value = "token", required = true)String token,
+                        Model model){
+        model.addAttribute("token", token);
+        return "/reset";
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/reset", method = RequestMethod.POST)
+    public String resetPassword(@RequestBody User user,
+                                @RequestParam(value = "token", required = true)String token){
+        //JWT验证
+        try{
+            Algorithm algorithm = Algorithm.HMAC512(secret);
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .withIssuer("xue_hai")
+                    .build();
+            DecodedJWT jwt = verifier.verify(token);
+            String email = jwt.getSubject();
+            String password = user.getPassword();
+            user.setPassword(null);
+            user.setEmail(email);
+            user = userService.getUsers(user).get(0);
+            System.out.println(user);
+
+            //验证时间
+            if(new Date().getTime() > jwt.getExpiresAt().getTime()){
+                throw new Exception();
+
+            }
+            User user1 = new User();
+            user1.setId(user.getId());
+            user1.setPassword(password);
+            userService.modify(user1);
+            return "1";
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/getUsers", method =  RequestMethod.GET, produces = "application/json")
+    public List<User> getUsers(@RequestParam(value = "id", required = false)Long userId,
+                               @RequestParam(value = "username", required = false)String username,
+                               @RequestParam(value = "email", required = false)String email
+                               ){
+        return null;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/isDupicated/{email}", method = RequestMethod.GET)
+    public String isDuplicated(@PathVariable String email){
+        int num = userService.isDuplicated(email);
+        if(num == 1){
+            return "1";
+        }
+        else{
+            return "0";
+        }
+    }
 
     @ResponseBody
     @RequestMapping(value = "/modify", method = RequestMethod.POST)
@@ -110,7 +241,7 @@ public class UserController {
             SessionUtil.addInformation(httpServletRequest, user);
             return "1";
         }
-        return "";
+        return "0";
     }
 
     @ResponseBody
