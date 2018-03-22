@@ -41,8 +41,7 @@ public class UserController {
     @ResponseBody
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = "application/json")
     public UserVo login(@RequestBody RegistVo registVo,
-                        HttpServletRequest httpServletRequest,
-                        HttpServletResponse httpServletResponse){
+                        HttpServletRequest httpServletRequest){
         String email = registVo.getUser().getEmail();
         String password = registVo.getUser().getPassword();
         if(null == email || null == password){
@@ -74,7 +73,11 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
-    public String logout(HttpSession session){
+    public String logout(HttpServletRequest request){
+        if(request.getSession() == null){
+            return "0";
+        }
+        HttpSession session = request.getSession();
         session.setAttribute("login", false);
         return "1";
     }
@@ -87,8 +90,7 @@ public class UserController {
     @ResponseBody
     @RequestMapping(value = "/regist", method = RequestMethod.POST, produces = "application/json")
     public User regist(@RequestBody RegistVo registVo,
-                       HttpServletRequest httpServletRequest,
-                       HttpServletResponse httpServletResponse){
+                       HttpServletRequest httpServletRequest){
         User user = registVo.getUser();
         User user1 =  userService.regist(user);
         if(user1 != null){
@@ -136,7 +138,9 @@ public class UserController {
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public String upload(@RequestParam(value="file",required=false) CommonsMultipartFile file,
                          HttpServletRequest request) throws Exception{
-
+            if(request.getSession() == null){
+                return "0";
+            }
             //获得物理路径webapp所在路径
             String pathRoot = request.getSession().getServletContext().getRealPath("/");
             System.out.println(pathRoot);
@@ -160,7 +164,7 @@ public class UserController {
                 }
             }
 
-            return "1";
+            return "0";
     }
 
     @ResponseBody
@@ -210,9 +214,18 @@ public class UserController {
     @RequestMapping(value = "/getUsers", method =  RequestMethod.GET, produces = "application/json")
     public List<User> getUsers(@RequestParam(value = "id", required = false)Long userId,
                                @RequestParam(value = "username", required = false)String username,
-                               @RequestParam(value = "email", required = false)String email
+                               @RequestParam(value = "email", required = false)String email,
+                               HttpServletRequest request
                                ){
-        return null;
+        if(request.getSession() == null || request.getSession().getAttribute("authority") == null || (Integer)request.getSession().getAttribute("authority") != 1){
+            return null;
+        }
+        User user = new User();
+        user.setId(userId);
+        user.setUsername(username);
+        user.setEmail(email);
+        List<User> userList = userService.getUsers(user);
+        return userList;
     }
 
     @ResponseBody
@@ -229,16 +242,22 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/modify", method = RequestMethod.POST)
-    public String modify(@RequestBody User user, HttpServletRequest httpServletRequest){
-        if((Boolean) httpServletRequest.getSession().getAttribute("login")){
-            HttpSession session = httpServletRequest.getSession();
+    public String modify(@RequestBody User user, HttpServletRequest request){
+        if(request.getSession() == null){
+            return null;
+        }
+        if(request.getSession().getAttribute("login") == null){
+            return null;
+        }
+        if((Boolean) request.getSession().getAttribute("login")){
+            HttpSession session = request.getSession();
             user.setId((Long)session.getAttribute("userId"));
             user.setAuthority((int)session.getAttribute("authority"));
             user.setTime(null);
             if(null == userService.modify(user)){
                 return "0";
             }
-            SessionUtil.addInformation(httpServletRequest, user);
+            SessionUtil.addInformation(request, user);
             return "1";
         }
         return "0";
@@ -246,9 +265,15 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/follow/{id}", method = RequestMethod.POST)
-    public String follow(@PathVariable Long id, HttpServletRequest httpServletRequest){
-        if((Boolean) httpServletRequest.getSession().getAttribute("login")){
-            Follow follow = userService.follow((Long) httpServletRequest.getSession().getAttribute("userId"), id);
+    public String follow(@PathVariable Long id, HttpServletRequest request){
+        if(request.getSession() == null){
+            return null;
+        }
+        if(request.getSession().getAttribute("login") == null){
+            return null;
+        }
+        if((Boolean) request.getSession().getAttribute("login")){
+            Follow follow = userService.follow((Long) request.getSession().getAttribute("userId"), id);
             if(follow == null){
                 return "0";
             }
@@ -259,7 +284,14 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/cancelFollow/{userId}", method = RequestMethod.GET)
-    public String cancelFollow(@PathVariable Long userId, HttpSession session){
+    public String cancelFollow(@PathVariable Long userId, HttpServletRequest request){
+        if(request.getSession() == null){
+            return null;
+        }
+        if(request.getSession().getAttribute("login") == null){
+            return null;
+        }
+        HttpSession session = request.getSession();
         if((Boolean)session.getAttribute("login")){
             Follow follow = userService.cancelFollow((Long)session.getAttribute("userId"), userId);
             if(follow != null){
@@ -274,7 +306,14 @@ public class UserController {
     @RequestMapping(value = "/getFollowList", method = RequestMethod.GET, produces = "application/json")
     public List<Follow> getFollowedList(@RequestParam(value = "from", required = false)Long userFrom,
             @RequestParam(value = "to", required = false)Long userTo,
-            HttpSession session){
+            HttpServletRequest request){
+        if(request.getSession() == null){
+            return null;
+        }
+        if(request.getSession().getAttribute("login") == null){
+            return null;
+        }
+        HttpSession session = request.getSession();
         if((Boolean)session.getAttribute("login")){
             Follow follow = new Follow();
             follow.setUserFrom(userFrom);
@@ -288,8 +327,14 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
-    public String deleteUser(@PathVariable Long id, HttpServletRequest httpServletRequest){
-        HttpSession session = httpServletRequest.getSession();
+    public String deleteUser(@PathVariable Long id, HttpServletRequest request){
+        if(request.getSession() == null){
+            return null;
+        }
+        if(request.getSession().getAttribute("login") == null){
+            return null;
+        }
+        HttpSession session = request.getSession();
         if((Boolean)session.getAttribute("login") && (Integer)session.getAttribute("authority") == 1){
             int judge = userService.deleteUser(id);
             if(judge != 0){
@@ -302,7 +347,14 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/getMyDetail", method = RequestMethod.GET, produces = "application/json")
-    public UserVo getMyDetail(HttpSession session){
+    public UserVo getMyDetail(HttpServletRequest request){
+        if(request.getSession() == null){
+            return null;
+        }
+        if(request.getSession().getAttribute("login") == null){
+            return null;
+        }
+        HttpSession session = request.getSession();
         if((Boolean)session.getAttribute("login")){
             UserVo userVo = userService.getDetail((Long)session.getAttribute("userId"));
             return userVo;
@@ -312,7 +364,14 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping(value = "/getUserDetail/{userId}", method = RequestMethod.GET, produces = "application/json")
-    public UserVo getUserDetail(@PathVariable Long userId, HttpSession session) {
+    public UserVo getUserDetail(@PathVariable Long userId, HttpServletRequest request) {
+        if(request.getSession() == null){
+            return null;
+        }
+        if(request.getSession().getAttribute("login") == null){
+            return null;
+        }
+        HttpSession session = request.getSession();
         if((Boolean) session.getAttribute("login")){
             UserVo userVo = userService.getDetail(userId);
             return userVo;
@@ -324,7 +383,14 @@ public class UserController {
     @RequestMapping(value = "/getTimeLine", method = RequestMethod.GET, produces = "application/json")
     public List<TimeLine> getTimeLine(@RequestParam(value = "indexNum", required = false) int indexNum,
                                       @RequestParam(value = "number", required = false) int number,
-                                      HttpSession session){
+                                      HttpServletRequest request){
+        if(request.getSession() == null){
+            return null;
+        }
+        if(request.getSession().getAttribute("login") == null){
+            return null;
+        }
+        HttpSession session = request.getSession();
         if((Boolean) session.getAttribute("login")){
             Long userId = (Long )session.getAttribute("userId");
             NumberControl numberControl = new NumberControl();

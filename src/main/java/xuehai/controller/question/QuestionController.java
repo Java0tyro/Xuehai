@@ -24,6 +24,12 @@ public class QuestionController {
     @ResponseBody
     @RequestMapping(value = "/publish", method = RequestMethod.POST)
     public String publish(@RequestBody Question question, HttpServletRequest httpServletRequest){
+        if(httpServletRequest.getSession() == null){
+            return "0";
+        }
+        if(httpServletRequest.getSession().getAttribute("login") == null){
+            return "0";
+        }
         if((Boolean) httpServletRequest.getSession().getAttribute("login")){
             question.setUser((Long) httpServletRequest.getSession().getAttribute("userId"));
             Question question1 = questionService.publish(question);
@@ -37,13 +43,17 @@ public class QuestionController {
 
     @ResponseBody
     @RequestMapping(value = "/deleteQuestion/{id}", method = RequestMethod.GET)
-    public String deleteQuestion(@PathVariable Long id, HttpSession session){
-        Integer authority = (Integer) session.getAttribute("authority");
-        Boolean login = (Boolean) session.getAttribute("login");
-        if(login == true && authority == 1){
-            Question question = questionService.deleteQuestion(id);
-            if(question != null){
-                return "1";
+    public String deleteQuestion(@PathVariable Long id, HttpServletRequest request){
+        HttpSession session = request.getSession();
+        if(session != null  && session.getAttribute("authority") != null && session.getAttribute("login") != null){
+            Integer authority = (Integer) session.getAttribute("authority");
+            Boolean login = (Boolean) session.getAttribute("login");
+            if(login == true && authority == 1){
+                Question question = questionService.deleteQuestion(id);
+                if(question != null){
+                    return "1";
+                }
+                return "0";
             }
             return "0";
         }
@@ -54,6 +64,12 @@ public class QuestionController {
     @ResponseBody
     @RequestMapping(value = "/collection/{questionId}", method = RequestMethod.POST)
     public String collect(@PathVariable Long questionId, HttpServletRequest httpServletRequest){
+        if(httpServletRequest.getSession() == null){
+            return "0";
+        }
+        if(httpServletRequest.getSession().getAttribute("login") == null){
+            return "0";
+        }
         if((Boolean) httpServletRequest.getSession().getAttribute("login")){
             Long userId = (Long)httpServletRequest.getSession().getAttribute("userId");
             Collection collection = questionService.collect(userId, questionId);
@@ -68,6 +84,12 @@ public class QuestionController {
     @ResponseBody
     @RequestMapping(value = "/answer", method = RequestMethod.POST)
     public String answerQuestion(@RequestBody Answer answer, HttpServletRequest httpServletRequest){
+        if(httpServletRequest.getSession() == null){
+            return "0";
+        }
+        if(httpServletRequest.getSession().getAttribute("login") == null){
+            return "0";
+        }
         if((Boolean) httpServletRequest.getSession().getAttribute("login")){
             answer.setUser((Long)httpServletRequest.getSession().getAttribute("userId"));
             Answer answer1 = questionService.answerQuestion(answer);
@@ -81,8 +103,9 @@ public class QuestionController {
 
     @ResponseBody
     @RequestMapping(value = "/modifyAnswer", method = RequestMethod.POST)
-    public String modifyAnswer(@RequestBody Answer answer, HttpSession session){
-        if((Boolean) session.getAttribute("login")){
+    public String modifyAnswer(@RequestBody Answer answer, HttpServletRequest request){
+        HttpSession session = request.getSession();
+        if(session != null && session.getAttribute("login") != null && (Boolean)session.getAttribute("login") == true){
             Long userId = (Long)session.getAttribute("userId");
             answer.setUser(userId);
             Answer answer1 = questionService.modifyAnswer(answer);
@@ -96,8 +119,9 @@ public class QuestionController {
 
     @ResponseBody
     @RequestMapping(value = "/deleteAnswer/{id}", method = RequestMethod.GET)
-    public String deleteAnswer(@PathVariable Long id, HttpSession session){
-        if((Boolean) session.getAttribute("login")){
+    public String deleteAnswer(@PathVariable Long id, HttpServletRequest request){
+        HttpSession session = request.getSession();
+        if(session != null && session.getAttribute("login") != null && (Boolean)session.getAttribute("login") == true){
             Long userId = (Long)session.getAttribute("userId");
             Answer answer1 = questionService.deleteAnswer(userId, id);
             if(answer1 != null){
@@ -111,6 +135,12 @@ public class QuestionController {
     @ResponseBody
     @RequestMapping(value = "/likeAnswer/{answerId}", method = RequestMethod.GET)
     public String likeAnswer(@PathVariable Long answerId, HttpServletRequest httpServletRequest){
+        if(httpServletRequest.getSession() == null){
+            return "0";
+        }
+        if(httpServletRequest.getSession().getAttribute("login") == null){
+            return "0";
+        }
         if((Boolean) httpServletRequest.getSession().getAttribute("login")){
             Long userId = (Long)httpServletRequest.getSession().getAttribute("userId");
             Like like = questionService.likeAnswer(userId, answerId);
@@ -125,6 +155,12 @@ public class QuestionController {
     @ResponseBody
     @RequestMapping(value = "/comment", method = RequestMethod.POST)
     public String commentAnswer(@RequestBody Comment comment, HttpServletRequest httpServletRequest){
+        if(httpServletRequest.getSession() == null){
+            return "0";
+        }
+        if(httpServletRequest.getSession().getAttribute("login") == null){
+            return "0";
+        }
         if((Boolean) httpServletRequest.getSession().getAttribute("login")){
             comment.setUser((Long)httpServletRequest.getSession().getAttribute("userId"));
             Comment comment1 = questionService.commentAnswer(comment);
@@ -138,10 +174,14 @@ public class QuestionController {
 
     @ResponseBody
     @RequestMapping(value = "/deleteComment/{id}", method =  RequestMethod.GET)
-    public String deleteComment(@PathVariable Long id, HttpSession session){
-        if((Boolean) session.getAttribute("login")){
+    public String deleteComment(@PathVariable Long id, HttpServletRequest request){
+        HttpSession session = request.getSession();
+        if(session != null && session.getAttribute("login") != null && (Boolean)session.getAttribute("login") == true){
             Long userId = (Long)session.getAttribute("userId");
             Comment comment = questionService.deleteComment(userId, id);
+            if(comment != null){
+                return "1";
+            }
             return "0";
         }
         return "0";
@@ -154,9 +194,9 @@ public class QuestionController {
                                      @RequestParam(value = "content", required = false) String content,
                                      @RequestParam(value = "user", required = false) Long user,
                                      @RequestParam(value = "question", required = false) Long question,
-                                     HttpSession session
-                                     ){
-        if((Boolean)session.getAttribute("login")){
+                                     HttpServletRequest request){
+        HttpSession session = request.getSession();
+        if(session != null && session.getAttribute("login") != null && (Boolean)session.getAttribute("login") == true){
             Answer answer = new Answer();
             answer.setId(id);
             answer.setQuestion(question);
@@ -175,8 +215,9 @@ public class QuestionController {
                                          @RequestParam(value = "title", required = false)String title,
                                          @RequestParam(value = "content", required = false)String content,
                                          @RequestParam(value = "type", required = false)Long type,
-                                         HttpSession session ){
-        if((Boolean)session.getAttribute("login")){
+                                         HttpServletRequest request ){
+        HttpSession session = request.getSession();
+        if(session != null && session.getAttribute("login") != null && (Boolean)session.getAttribute("login") == true){
                 Question question = new Question();
                 System.out.println(id + " " + userId );
                 question.setUser(userId);
@@ -195,8 +236,9 @@ public class QuestionController {
     @RequestMapping(value = "/getCollectionList", method = RequestMethod.GET, produces = "application/json")
     public List<Collection> getCollectionList(@RequestParam(value = "questionId", required = false) Long questionId,
                                                 @RequestParam(value = "userId", required = false)Long userId,
-                                              HttpSession session){
-        if((Boolean)session.getAttribute("login")){
+                                              HttpServletRequest request){
+        HttpSession session = request.getSession();
+        if(session != null && session.getAttribute("login") != null && (Boolean)session.getAttribute("login") == true){
             Collection collection = new Collection();
             collection.setQuestion(questionId);
             collection.setUser(userId);
@@ -207,8 +249,9 @@ public class QuestionController {
 
     @ResponseBody
     @RequestMapping(value = "/getLikeList/{answerId}", method = RequestMethod.GET, produces = "application/json")
-    public List<Like> getLikeList(@PathVariable Long answerId, HttpSession session){
-        if((Boolean)session.getAttribute("login")){
+    public List<Like> getLikeList(@PathVariable Long answerId, HttpServletRequest request){
+        HttpSession session = request.getSession();
+        if(session != null && session.getAttribute("login") != null && (Boolean)session.getAttribute("login") == true){
             Like like = new Like();
             like.setAnswer(answerId);
             return questionService.getLikeList(like);
@@ -224,9 +267,10 @@ public class QuestionController {
                                      @RequestParam(value = "user", required = false)Long userId,
                                      @RequestParam(value = "content", required = false)String content,
                                      @RequestParam(value = "answer", required = false)Long answer,
-                                     HttpSession session
+                                     HttpServletRequest request
                                      ){
-        if((Boolean)session.getAttribute("login")){
+        HttpSession session = request.getSession();
+        if(session != null && session.getAttribute("login") != null && (Boolean)session.getAttribute("login") == true){
             Comment comment = new Comment();
             comment.setUser(userId);
             comment.setAnswer(answer);
@@ -244,8 +288,9 @@ public class QuestionController {
     public List<QuestionType> getQuestionType(@RequestParam(value = "id", required = false) Long id,
                                               @RequestParam(value = "name", required = false)String name,
                                               @RequestParam(value = "parent", required = false)Long parent,
-                                              HttpSession session){
-        if((Boolean)session.getAttribute("login")){
+                                              HttpServletRequest request){
+        HttpSession session = request.getSession();
+        if(session != null && session.getAttribute("login") != null && (Boolean)session.getAttribute("login") == true){
             QuestionType questionType = new QuestionType();
             questionType.setId(id);
             questionType.setName(name);
