@@ -115,7 +115,7 @@ public class UserController {
     @RequestMapping(value = "/forget", method = RequestMethod.GET)
     public String forgetPassword(@RequestParam(value = "email", required = true)String email) throws Exception{
         if(userService.isDuplicated(email) != 1){
-            return "";
+            return "0";
         }
         Date start = new Date();
         Date end = new Date();
