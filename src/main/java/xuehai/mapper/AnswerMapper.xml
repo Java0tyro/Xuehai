@@ -153,4 +153,8 @@
     select count(*)
     from answer where user = #{userId}
   </select>
+  
+  <select id="getQuestionAnswerNum" parameterType="java.lang.Long" resultType="java.lang.Integer">
+    SELECT COUNT(*) from answer WHERE question = #{questionId}
+  </select>
 </mapper>

@@ -219,7 +219,7 @@ public class QuestionController {
         HttpSession session = request.getSession();
         if(session != null && session.getAttribute("login") != null && (Boolean)session.getAttribute("login") == true){
                 Question question = new Question();
-                System.out.println(id + " " + userId );
+                //System.out.println(id + " " + userId );
                 question.setUser(userId);
                 question.setId(id);
                 question.setTitle(title);

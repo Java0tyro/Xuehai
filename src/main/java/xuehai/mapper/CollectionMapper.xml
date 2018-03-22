@@ -108,4 +108,9 @@
     SELECT count(*)
     FROM collection WHERE user = #{userId}
   </select>
+
+  <select id="getQuestionCollectionNum" parameterType="java.lang.Long" resultType="java.lang.Integer">
+    SELECT count(*)
+    FROM collection WHERE question = #{questionId}
+  </select>
 </mapper>

@@ -24,4 +24,6 @@ public interface CollectionMapper {
     int deleteByQuestionId(Long questionId);
 
     int getCollectionNum(Long userId);
+
+    int getQuestionCollectionNum(Long questionId);
 }

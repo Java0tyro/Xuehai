@@ -26,4 +26,6 @@ public interface AnswerMapper {
     int deleteByQuestionId(Long questionId);
 
     int getAnswerNum(Long userId);
+
+    int getQuestionAnswerNum(Long questionId);
 }

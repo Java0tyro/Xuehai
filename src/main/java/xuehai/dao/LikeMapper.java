@@ -26,4 +26,6 @@ public interface LikeMapper {
     int deleteByAnswerId(Long answerId);
 
     int getLikedNum(Long userId);
+
+    int getAnswerLikedNum(Long answerId);
 }

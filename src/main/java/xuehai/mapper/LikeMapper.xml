@@ -117,4 +117,9 @@
     SELECT COUNT(*)
     FROM `like` WHERE `like`.answer in (SELECT id FROM answer WHERE answer.user = #{usreId})
   </select>
+
+  <select id="getAnswerLikedNum" parameterType="java.lang.Long" resultType="java.lang.Integer">
+    SELECT COUNT(*)
+    FROM `like` WHERE answer = #{answerId}
+  </select>
 </mapper>

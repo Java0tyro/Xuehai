@@ -177,14 +177,16 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public List<AnswerVo> getAnswers(Answer answer) {
         List<AnswerVo> answerVoList = new LinkedList<>();
-        AnswerVo answerVo = new AnswerVo();
+        AnswerVo answerVo;
         answer.setContent(answer.getContent() != null ?
                 "%" + answer.getContent() + "%" : null);
+        //System.out.println(answer);
         List<Answer> answerList = answerMapper.selectSelective(answer);
         for(Answer answer1 : answerList){
+            answerVo  = new AnswerVo();
            answerVo.setAnswer(answer1);
            answerVo.setCommentNum(commentMapper.getCommentNum(answer1.getId()));
-           answerVo.setLikedNum(likeMapper.getLikedNum(answer1.getUser()));
+           answerVo.setLikedNum(likeMapper.getAnswerLikedNum(answer1.getUser()));
            answerVoList.add(answerVo);
         }
         return answerVoList;
@@ -216,15 +218,19 @@ public class QuestionServiceImpl implements QuestionService {
         question.setContent(question.getContent() != null ?
                 "%" + question.getContent() + "%" : null);
 
-        QuestionVo questionVo = new QuestionVo();
-
+        QuestionVo questionVo;
+        //System.out.println(question);
         List<Question> questionList = questionMapper.selectSelective(question);
+        //System.out.println(questionList);
         for(Question question1 : questionList){
+            questionVo = new QuestionVo();
+            //System.out.println(question1);
             questionVo.setQuestion(question1);
-            Long userId = question1.getUser();
-            questionVo.setAnswerNum(answerMapper.getAnswerNum(userId));
-            questionVo.setCollectionNum(collectionMapper.getCollectionNum(userId));
+            Long questionId = question1.getId();
+            questionVo.setAnswerNum(answerMapper.getQuestionAnswerNum(questionId));
+            questionVo.setCollectionNum(collectionMapper.getQuestionCollectionNum(questionId));
             questionVoList.add(questionVo);
+            //System.out.println(questionVoList);
         }
         return questionVoList;
     }
