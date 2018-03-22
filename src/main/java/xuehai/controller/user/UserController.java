@@ -172,7 +172,7 @@ public class UserController {
     public String reset(@RequestParam(value = "token", required = true)String token,
                         Model model){
         model.addAttribute("token", token);
-        return "/reset";
+        return "reset";
     }
 
     @ResponseBody

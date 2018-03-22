@@ -96,7 +96,8 @@ class MailConfigure {
         EMAIL_HOST = properties.getProperty("email_host");
         EMAIL_USERNAME = properties.getProperty("email_username");
         EMAIL_PWD = properties.getProperty("email_pwd");
-        //System.out.println(properties);
+        System.out.println(EMAIL_FORM + EMAIL_HOST +EMAIL_USERNAME + EMAIL_PWD);
+        System.out.println(properties);
     }
 }
 
