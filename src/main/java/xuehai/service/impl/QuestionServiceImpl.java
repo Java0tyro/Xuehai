@@ -186,7 +186,7 @@ public class QuestionServiceImpl implements QuestionService {
             answerVo  = new AnswerVo();
            answerVo.setAnswer(answer1);
            answerVo.setCommentNum(commentMapper.getCommentNum(answer1.getId()));
-           answerVo.setLikedNum(likeMapper.getAnswerLikedNum(answer1.getUser()));
+           answerVo.setLikedNum(likeMapper.getAnswerLikedNum(answer1.getId()));
            answerVoList.add(answerVo);
         }
         return answerVoList;
