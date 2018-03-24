@@ -167,7 +167,7 @@ public class UserController {
             return "0";
     }
 
-    @ResponseBody
+
     @RequestMapping(value = "/reset", method = RequestMethod.GET)
     public String reset(@RequestParam(value = "token", required = true)String token,
                         Model model){
