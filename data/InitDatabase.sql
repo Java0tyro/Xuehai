@@ -1,15 +1,9 @@
 -- 脚本开始
 
-
-
 CREATE DATABASE IF NOT EXISTS `demo_xuehai` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `demo_xuehai`;
 
-
-
 -- --------------------------------------------------------------------------
--- 表
-
 
 -- 用户表
 DROP TABLE IF EXISTS `user`;
@@ -108,9 +102,10 @@ CREATE TABLE follow (
 );
 
 
-
 -- --------------------------------------------------------------------------
 -- 存储过程
+
+-- 获取时间线
 DROP PROCEDURE IF EXISTS sp_GetTimeline;
 DELIMITER $$
 CREATE PROCEDURE sp_GetTimeline (
@@ -118,6 +113,8 @@ CREATE PROCEDURE sp_GetTimeline (
 	IN index_num INT,
 	IN number INT
 ) BEGIN
+
+
 DROP TABLE IF EXISTS `temp_timeline`;
 CREATE TEMPORARY TABLE `temp_timeline` (
 	`content1_id` BIGINT,
@@ -128,7 +125,8 @@ CREATE TEMPORARY TABLE `temp_timeline` (
 	`content3` VARCHAR(128),
 	`content_type` INT,
 	`time` TIMESTAMP
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- 获取关注列表
 DROP TABLE IF EXISTS `temp_following`;
@@ -142,7 +140,6 @@ WHERE `id` IN (
 
 
 -- 有了新的关注
-
 INSERT INTO `temp_timeline` (
     `content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
 )
@@ -151,15 +148,14 @@ FROM `follow` `a` INNER JOIN `user` `b` ON ( a.user_from = b.id )
 WHERE a.user_to = user_id;
 
 
-
-
 -- 插入数据：提问有了回答
 INSERT INTO `temp_timeline` (
 	`content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
 )
-SELECT c.id, c.username, a.id, a.title, b.id, b.content, 1, b.time
+SELECT c.id, c.username, a.id, a.title, b.id, SUBSTRING(b.content, 1, 128), 1, b.time
 FROM `question` `a` INNER JOIN `answer` `b` ON ( `a`.`id` = `b`.`question`) INNER JOIN `user` `c` ON ( `b`.`user` = `c`.`id` )
 WHERE a.`user` = user_id;
+
 
 -- 插入数据：提问有了收藏
 INSERT INTO `temp_timeline` (
@@ -170,37 +166,31 @@ FROM `question` `a` INNER JOIN `collection` `b` ON ( `a`.`id` = `b`.`question`) 
 WHERE a.`user` = user_id;
 
 
-
-
 -- 插入数据：回答有了评论
 INSERT INTO `temp_timeline` (
 	`content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
 )
-SELECT c.id, c.username, a.id, a.content, b.id, b.content, 3, b.time
+SELECT c.id, c.username, a.id, SUBSTRING(a.content, 1, 128), b.id, SUBSTRING(b.content, 1, 128), 3, b.time
 FROM `answer` `a` INNER JOIN `comment` `b` ON ( `a`.`id` = `b`.`answer`) INNER JOIN `user` `c` ON ( `b`.`user` = `c`.`id` )
 WHERE a.`user` = user_id;
+
 
 -- 插入数据：回答有了点赞
 INSERT INTO `temp_timeline` (
 	`content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
 )
-SELECT c.id, c.username, a.id, a.content, b.id, "", 4, b.time
+SELECT c.id, c.username, a.id, SUBSTRING(a.content, 1, 128), b.id, "", 4, b.time
 FROM `answer` `a` INNER JOIN `like` `b` ON ( `a`.`id` = `b`.`answer`) INNER JOIN `user` `c` ON ( `b`.`user` = `c`.`id` )
 WHERE a.`user` = user_id;
-
-
-
 
 
 -- 插入数据：评论有了评论
 INSERT INTO `temp_timeline` (
 	`content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
 )
-SELECT c.id, c.username, a.id, a.content, b.id, b.content, 5, b.time
+SELECT c.id, c.username, a.id, SUBSTRING(a.content,1, 128), b.id, SUBSTRING(b.content,1, 128), 5, b.time
 FROM `comment` `a` INNER JOIN `comment` `b` ON ( `a`.`id` = `b`.`parent`) INNER JOIN `user` `c` ON ( `b`.`user` = `c`.`id` )
 WHERE a.`user` = user_id;
-
-
 
 
 -- Following：提问
@@ -215,7 +205,7 @@ FROM temp_following `a` INNER JOIN question `b` ON ( a.id = b.`user` );
 INSERT INTO `temp_timeline` (
 	`content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
 )
-SELECT a.id, a.username, c.id, c.title, b.id, b.content, 7, b.time
+SELECT a.id, a.username, c.id, c.title, b.id, SUBSTRING(b.content,1, 128), 7, b.time
 FROM temp_following `a` INNER JOIN answer `b` ON ( a.id = b.`user` ) INNER JOIN question `c` ON ( c.id = b.question ) ;
 
 
@@ -231,9 +221,8 @@ FROM temp_following `a` INNER JOIN collection `b` ON ( a.id = b.`user` ) INNER J
 INSERT INTO temp_timeline (
 	`content1_id`, `content1`, `content2_id`, `content2`, `content3_id`, `content3`, `content_type`, `time`
 )
-SELECT a.id, a.username, c.id, c.content, b.id, "", 9, b.time
+SELECT a.id, a.username, c.id, SUBSTRING(c.content, 1, 128), b.id, "", 9, b.time
 FROM temp_following `a` INNER JOIN `like` `b` ON ( a.id = b.`user` ) INNER JOIN answer `c` ON ( b.answer = c.id );
-
 
 
 -- 返回temp_timeline
@@ -250,6 +239,7 @@ DROP PROCEDURE IF EXISTS sp_DeleteUser ;
 DELIMITER $$
 CREATE PROCEDURE sp_DeleteUser (IN user_id BIGINT)
 BEGIN
+
 	UPDATE answer SET `user` = NULL WHERE `user` = user_id;
 	DELETE FROM collection WHERE `user` = user_id;
 	UPDATE `comment` SET `user` = NULL WHERE `user` = user_id;
@@ -257,6 +247,7 @@ BEGIN
 	DELETE FROM `like` WHERE `user` = user_id;
 	UPDATE question SET `user` = NULL WHERE `user` = user_id;
 	DELETE FROM `user` WHERE id = user_id;
+	
 END;
 $$
 DELIMITER ;
