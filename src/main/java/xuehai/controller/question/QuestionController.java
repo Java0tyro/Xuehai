@@ -248,12 +248,15 @@ public class QuestionController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/getLikeList/{answerId}", method = RequestMethod.GET, produces = "application/json")
-    public List<Like> getLikeList(@PathVariable Long answerId, HttpServletRequest request){
+    @RequestMapping(value = "/getLikeList", method = RequestMethod.GET, produces = "application/json")
+    public List<Like> getLikeList(@RequestParam(value = "answerId", required = false) Long answerId,
+                                  @RequestParam(value = "userId", required = false)Long userId,
+                                  HttpServletRequest request){
         HttpSession session = request.getSession();
         if(session != null && session.getAttribute("login") != null && (Boolean)session.getAttribute("login") == true){
             Like like = new Like();
             like.setAnswer(answerId);
+            like.setUser(userId);
             return questionService.getLikeList(like);
         }
         return null;

@@ -229,8 +229,8 @@ public class UserController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/isDupicated/{email}", method = RequestMethod.GET)
-    public String isDuplicated(@PathVariable String email){
+    @RequestMapping(value = "/isDupicated", method = RequestMethod.GET)
+    public String isDuplicated(@RequestParam(value = "email", required = true) String email){
         int num = userService.isDuplicated(email);
         if(num == 1){
             return "1";
